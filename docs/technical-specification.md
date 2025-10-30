@@ -13,6 +13,7 @@
 This technical specification provides detailed implementation guidance for the I Know entertainment intelligence platform. It expands on the architectural decisions with concrete patterns, standards, and specifications needed for Phase 4 implementation. The document covers data models, API specifications, performance requirements, security implementation, testing strategies, and deployment configurations.
 
 **Key Technical Requirements:**
+
 - Sub-500ms response times for actor identification
 - 99.5% uptime with 99.9% accuracy in actor recognition
 - Mobile-first progressive web applications
@@ -26,6 +27,7 @@ This technical specification provides detailed implementation guidance for the I
 ### 1.1 Core Entity Definitions
 
 #### Actor Model
+
 ```typescript
 // packages/types/src/actor-types.ts
 export interface Actor {
@@ -71,6 +73,7 @@ export interface ActorQualityFlags {
 ```
 
 #### User Model
+
 ```typescript
 // packages/types/src/user-types.ts
 export interface User {
@@ -113,6 +116,7 @@ export interface UIPreferences {
 ```
 
 #### Content Model
+
 ```typescript
 // packages/types/src/content-types.ts
 export interface Content {
@@ -155,6 +159,7 @@ export interface ContentMetadata {
 ### 1.2 Database Schema
 
 #### Primary Tables
+
 ```sql
 -- packages/database/src/schemas/actors.sql
 CREATE TYPE content_type AS ENUM ('movie', 'series', 'episode');
@@ -236,6 +241,7 @@ CREATE TABLE filmography (
 ```
 
 #### User Tables
+
 ```sql
 -- packages/database/src/schemas/users.sql
 -- Users table
@@ -287,6 +293,7 @@ CREATE TABLE watchlist (
 ```
 
 #### Performance Indexes
+
 ```sql
 -- packages/database/src/schemas/indexes.sql
 -- Search optimization indexes
@@ -315,6 +322,7 @@ CREATE INDEX CONCURRENTLY idx_users_subscription ON users(subscription_tier, sub
 ### 1.3 Database Triggers & Functions
 
 #### Update Timestamps
+
 ```sql
 -- packages/database/src/schemas/triggers.sql
 -- Function to update updated_at timestamp
@@ -338,6 +346,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
 ```
 
 #### Search Vector Updates
+
 ```sql
 -- Function to update search vectors
 CREATE OR REPLACE FUNCTION update_actor_search_vector()
@@ -362,6 +371,7 @@ CREATE TRIGGER update_actor_search_vector_trigger BEFORE INSERT OR UPDATE ON act
 ### 2.1 API Design Standards
 
 #### Response Format
+
 ```typescript
 // packages/types/src/api-types.ts
 export interface APIResponse<T = any> {
@@ -397,6 +407,7 @@ export interface PaginationMeta {
 ```
 
 #### Error Codes
+
 ```typescript
 export const ErrorCodes = {
   // Authentication errors (1000-1099)
@@ -425,359 +436,375 @@ export const ErrorCodes = {
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   DATABASE_ERROR: 'DATABASE_ERROR',
   EXTERNAL_API_ERROR: 'EXTERNAL_API_ERROR',
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED'
+  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
 } as const;
 ```
 
 ### 2.2 Actor API Endpoints
 
 #### GET /api/v1/actors/:id
+
 ```typescript
 // apps/api/src/routes/actors/[id].ts
 import { Elysia, t } from 'elysia';
 import { ActorService } from '../../services/actor-service';
 
 export const getActorRoute = (app: Elysia) =>
-  app.get('/actors/:id', async ({ params, set, request }) => {
-    const requestId = request.headers.get('x-request-id') || generateRequestId();
-    const startTime = Date.now();
+  app.get(
+    '/actors/:id',
+    async ({ params, set, request }) => {
+      const requestId = request.headers.get('x-request-id') || generateRequestId();
+      const startTime = Date.now();
 
-    try {
-      const actorService = new ActorService();
-      const actor = await actorService.getActorById(params.id);
+      try {
+        const actorService = new ActorService();
+        const actor = await actorService.getActorById(params.id);
 
-      if (!actor) {
-        set.status = 404;
+        if (!actor) {
+          set.status = 404;
+          return {
+            error: {
+              code: 'ACTOR_NOT_FOUND',
+              message: 'Actor with specified ID not found',
+              details: { actorId: params.id },
+              timestamp: new Date().toISOString(),
+              requestId,
+            },
+          };
+        }
+
+        return {
+          data: actor,
+          meta: {
+            requestId,
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+            processingTime: Date.now() - startTime,
+          },
+        };
+      } catch (error) {
+        set.status = 500;
         return {
           error: {
-            code: 'ACTOR_NOT_FOUND',
-            message: 'Actor with specified ID not found',
-            details: { actorId: params.id },
+            code: 'INTERNAL_ERROR',
+            message: 'An unexpected error occurred',
+            details: { originalError: error.message },
             timestamp: new Date().toISOString(),
-            requestId
-          }
+            requestId,
+          },
         };
       }
-
-      return {
-        data: actor,
-        meta: {
-          requestId,
-          timestamp: new Date().toISOString(),
-          version: '1.0',
-          processingTime: Date.now() - startTime
-        }
-      };
-    } catch (error) {
-      set.status = 500;
-      return {
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: 'An unexpected error occurred',
-          details: { originalError: error.message },
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      };
-    }
-  }, {
-    params: t.Object({
-      id: t.String({
-        format: 'uuid',
-        error: 'Invalid actor ID format'
-      })
-    }),
-    response: {
-      200: t.Object({
-        data: t.Any(),
-        meta: t.Object({
-          requestId: t.String(),
-          timestamp: t.String(),
-          version: t.String(),
-          processingTime: t.Number()
-        })
+    },
+    {
+      params: t.Object({
+        id: t.String({
+          format: 'uuid',
+          error: 'Invalid actor ID format',
+        }),
       }),
-      404: t.Object({
-        error: t.Object({
-          code: t.String(),
-          message: t.String(),
-          details: t.Optional(t.Any()),
-          timestamp: t.String(),
-          requestId: t.String()
-        })
-      })
-    }
-  });
+      response: {
+        200: t.Object({
+          data: t.Any(),
+          meta: t.Object({
+            requestId: t.String(),
+            timestamp: t.String(),
+            version: t.String(),
+            processingTime: t.Number(),
+          }),
+        }),
+        404: t.Object({
+          error: t.Object({
+            code: t.String(),
+            message: t.String(),
+            details: t.Optional(t.Any()),
+            timestamp: t.String(),
+            requestId: t.String(),
+          }),
+        }),
+      },
+    },
+  );
 ```
 
 #### GET /api/v1/actors/search
+
 ```typescript
 // apps/api/src/routes/actors/search.ts
 export const searchActorsRoute = (app: Elysia) =>
-  app.get('/actors/search', async ({ query, set, request }) => {
-    const requestId = request.headers.get('x-request-id') || generateRequestId();
-    const startTime = Date.now();
+  app.get(
+    '/actors/search',
+    async ({ query, set, request }) => {
+      const requestId = request.headers.get('x-request-id') || generateRequestId();
+      const startTime = Date.now();
 
-    // Validate search parameters
-    const validation = validateSearchQuery(query);
-    if (!validation.valid) {
-      set.status = 400;
-      return {
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid search parameters',
-          details: validation.errors,
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      };
-    }
+      // Validate search parameters
+      const validation = validateSearchQuery(query);
+      if (!validation.valid) {
+        set.status = 400;
+        return {
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid search parameters',
+            details: validation.errors,
+            timestamp: new Date().toISOString(),
+            requestId,
+          },
+        };
+      }
 
-    try {
-      const actorService = new ActorService();
-      const result = await actorService.searchActors({
-        query: query.q,
-        limit: Math.min(parseInt(query.limit) || 20, 100),
-        offset: Math.max(parseInt(query.offset) || 0, 0),
-        contentType: query.type,
-        year: query.year ? parseInt(query.year) : undefined,
-        sortBy: query.sortBy || 'relevance',
-        sortOrder: query.sortOrder || 'desc'
-      });
+      try {
+        const actorService = new ActorService();
+        const result = await actorService.searchActors({
+          query: query.q,
+          limit: Math.min(parseInt(query.limit) || 20, 100),
+          offset: Math.max(parseInt(query.offset) || 0, 0),
+          contentType: query.type,
+          year: query.year ? parseInt(query.year) : undefined,
+          sortBy: query.sortBy || 'relevance',
+          sortOrder: query.sortOrder || 'desc',
+        });
 
-      return {
-        data: result.actors,
-        meta: {
-          requestId,
-          timestamp: new Date().toISOString(),
-          version: '1.0',
-          processingTime: Date.now() - startTime,
-          searchTime: result.searchTime
-        },
-        pagination: {
-          total: result.total,
-          limit: result.limit,
-          offset: result.offset,
-          hasMore: result.hasMore,
-          nextPage: result.hasMore ? result.offset + result.limit : undefined,
-          prevPage: result.offset > 0 ? Math.max(0, result.offset - result.limit) : undefined
-        }
-      };
-    } catch (error) {
-      set.status = 500;
-      return {
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: 'Search failed',
-          details: { originalError: error.message },
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      };
-    }
-  }, {
-    query: t.Object({
-      q: t.String({
-        minLength: 1,
-        maxLength: 100,
-        error: 'Search query must be 1-100 characters'
-      }),
-      limit: t.Optional(t.String({
-        pattern: '^[0-9]+$',
-        error: 'Limit must be a positive integer'
-      })),
-      offset: t.Optional(t.String({
-        pattern: '^[0-9]+$',
-        error: 'Offset must be a non-negative integer'
-      })),
-      type: t.Optional(t.Union([
-        t.Literal('movie'),
-        t.Literal('series'),
-        t.Literal('all')
-      ])),
-      year: t.Optional(t.String({
-        pattern: '^[0-9]{4}$',
-        error: 'Year must be a 4-digit number'
-      })),
-      sortBy: t.Optional(t.Union([
-        t.Literal('relevance'),
-        t.Literal('name'),
-        t.Literal('popularity'),
-        t.Literal('year')
-      ])),
-      sortOrder: t.Optional(t.Union([
-        t.Literal('asc'),
-        t.Literal('desc')
-      ]))
-    }),
-    response: {
-      200: t.Object({
-        data: t.Array(t.Any()),
-        meta: t.Object({
-          requestId: t.String(),
-          timestamp: t.String(),
-          version: t.String(),
-          processingTime: t.Number(),
-          searchTime: t.Number()
+        return {
+          data: result.actors,
+          meta: {
+            requestId,
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+            processingTime: Date.now() - startTime,
+            searchTime: result.searchTime,
+          },
+          pagination: {
+            total: result.total,
+            limit: result.limit,
+            offset: result.offset,
+            hasMore: result.hasMore,
+            nextPage: result.hasMore ? result.offset + result.limit : undefined,
+            prevPage: result.offset > 0 ? Math.max(0, result.offset - result.limit) : undefined,
+          },
+        };
+      } catch (error) {
+        set.status = 500;
+        return {
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Search failed',
+            details: { originalError: error.message },
+            timestamp: new Date().toISOString(),
+            requestId,
+          },
+        };
+      }
+    },
+    {
+      query: t.Object({
+        q: t.String({
+          minLength: 1,
+          maxLength: 100,
+          error: 'Search query must be 1-100 characters',
         }),
-        pagination: t.Object({
-          total: t.Number(),
-          limit: t.Number(),
-          offset: t.Number(),
-          hasMore: t.Boolean(),
-          nextPage: t.Optional(t.Number()),
-          prevPage: t.Optional(t.Number())
-        })
-      })
-    }
-  });
+        limit: t.Optional(
+          t.String({
+            pattern: '^[0-9]+$',
+            error: 'Limit must be a positive integer',
+          }),
+        ),
+        offset: t.Optional(
+          t.String({
+            pattern: '^[0-9]+$',
+            error: 'Offset must be a non-negative integer',
+          }),
+        ),
+        type: t.Optional(t.Union([t.Literal('movie'), t.Literal('series'), t.Literal('all')])),
+        year: t.Optional(
+          t.String({
+            pattern: '^[0-9]{4}$',
+            error: 'Year must be a 4-digit number',
+          }),
+        ),
+        sortBy: t.Optional(
+          t.Union([
+            t.Literal('relevance'),
+            t.Literal('name'),
+            t.Literal('popularity'),
+            t.Literal('year'),
+          ]),
+        ),
+        sortOrder: t.Optional(t.Union([t.Literal('asc'), t.Literal('desc')])),
+      }),
+      response: {
+        200: t.Object({
+          data: t.Array(t.Any()),
+          meta: t.Object({
+            requestId: t.String(),
+            timestamp: t.String(),
+            version: t.String(),
+            processingTime: t.Number(),
+            searchTime: t.Number(),
+          }),
+          pagination: t.Object({
+            total: t.Number(),
+            limit: t.Number(),
+            offset: t.Number(),
+            hasMore: t.Boolean(),
+            nextPage: t.Optional(t.Number()),
+            prevPage: t.Optional(t.Number()),
+          }),
+        }),
+      },
+    },
+  );
 ```
 
 ### 2.3 User API Endpoints
 
 #### POST /api/v1/users/register
+
 ```typescript
 // apps/api/src/routes/users/register.ts
 export const registerUserRoute = (app: Elysia) =>
-  app.post('/users/register', async ({ body, set, request }) => {
-    const requestId = request.headers.get('x-request-id') || generateRequestId();
-    const startTime = Date.now();
+  app.post(
+    '/users/register',
+    async ({ body, set, request }) => {
+      const requestId = request.headers.get('x-request-id') || generateRequestId();
+      const startTime = Date.now();
 
-    // Validate input
-    const validation = validateRegistrationInput(body);
-    if (!validation.valid) {
-      set.status = 400;
-      return {
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid registration data',
-          details: validation.errors,
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      };
-    }
-
-    try {
-      const userService = new UserService();
-
-      // Check for existing email/username
-      const existing = await userService.findExistingUser(body.email, body.username);
-      if (existing) {
-        set.status = 409;
+      // Validate input
+      const validation = validateRegistrationInput(body);
+      if (!validation.valid) {
+        set.status = 400;
         return {
           error: {
-            code: existing.email === body.email ? 'DUPLICATE_EMAIL' : 'DUPLICATE_USERNAME',
-            message: `User with this ${existing.email === body.email ? 'email' : 'username'} already exists`,
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid registration data',
+            details: validation.errors,
             timestamp: new Date().toISOString(),
-            requestId
-          }
+            requestId,
+          },
         };
       }
 
-      // Create user
-      const user = await userService.createUser({
-        email: body.email,
-        username: body.username,
-        password: body.password,
-        preferences: {
-          notifications: {
-            newContentAlerts: true,
-            actorUpdates: true,
-            emailDigest: 'weekly',
-            pushNotifications: false
-          },
-          privacy: {
-            profileVisibility: 'public',
-            shareViewingHistory: false,
-            allowRecommendations: true
-          },
-          discovery: {
-            preferredGenres: [],
-            preferredDecades: [],
-            avoidSpoilers: true,
-            autoDetect: true
-          },
-          ui: {
-            theme: 'auto',
-            language: 'en',
-            compactMode: false,
-            showRatings: true
-          }
-        }
-      });
+      try {
+        const userService = new UserService();
 
-      // Generate verification token
-      const verificationToken = await userService.generateEmailVerificationToken(user.id);
-
-      // Send verification email (async)
-      sendVerificationEmail(user.email, verificationToken).catch(console.error);
-
-      set.status = 201;
-      return {
-        data: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          emailVerified: false,
-          preferences: user.preferences,
-          createdAt: user.createdAt
-        },
-        meta: {
-          requestId,
-          timestamp: new Date().toISOString(),
-          version: '1.0',
-          processingTime: Date.now() - startTime
+        // Check for existing email/username
+        const existing = await userService.findExistingUser(body.email, body.username);
+        if (existing) {
+          set.status = 409;
+          return {
+            error: {
+              code: existing.email === body.email ? 'DUPLICATE_EMAIL' : 'DUPLICATE_USERNAME',
+              message: `User with this ${existing.email === body.email ? 'email' : 'username'} already exists`,
+              timestamp: new Date().toISOString(),
+              requestId,
+            },
+          };
         }
-      };
-    } catch (error) {
-      set.status = 500;
-      return {
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: 'Registration failed',
-          details: { originalError: error.message },
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      };
-    }
-  }, {
-    body: t.Object({
-      email: t.String({
-        format: 'email',
-        error: 'Valid email address required'
-      }),
-      username: t.String({
-        minLength: 3,
-        maxLength: 30,
-        pattern: '^[a-zA-Z0-9_-]+$',
-        error: 'Username must be 3-30 characters, alphanumeric and underscore only'
-      }),
-      password: t.String({
-        minLength: 12,
-        error: 'Password must be at least 12 characters long'
-      })
-    }),
-    response: {
-      201: t.Object({
-        data: t.Object({
-          id: t.String(),
-          email: t.String(),
-          username: t.String(),
-          emailVerified: t.Boolean(),
-          preferences: t.Any(),
-          createdAt: t.String()
+
+        // Create user
+        const user = await userService.createUser({
+          email: body.email,
+          username: body.username,
+          password: body.password,
+          preferences: {
+            notifications: {
+              newContentAlerts: true,
+              actorUpdates: true,
+              emailDigest: 'weekly',
+              pushNotifications: false,
+            },
+            privacy: {
+              profileVisibility: 'public',
+              shareViewingHistory: false,
+              allowRecommendations: true,
+            },
+            discovery: {
+              preferredGenres: [],
+              preferredDecades: [],
+              avoidSpoilers: true,
+              autoDetect: true,
+            },
+            ui: {
+              theme: 'auto',
+              language: 'en',
+              compactMode: false,
+              showRatings: true,
+            },
+          },
+        });
+
+        // Generate verification token
+        const verificationToken = await userService.generateEmailVerificationToken(user.id);
+
+        // Send verification email (async)
+        sendVerificationEmail(user.email, verificationToken).catch(console.error);
+
+        set.status = 201;
+        return {
+          data: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            emailVerified: false,
+            preferences: user.preferences,
+            createdAt: user.createdAt,
+          },
+          meta: {
+            requestId,
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+            processingTime: Date.now() - startTime,
+          },
+        };
+      } catch (error) {
+        set.status = 500;
+        return {
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Registration failed',
+            details: { originalError: error.message },
+            timestamp: new Date().toISOString(),
+            requestId,
+          },
+        };
+      }
+    },
+    {
+      body: t.Object({
+        email: t.String({
+          format: 'email',
+          error: 'Valid email address required',
         }),
-        meta: t.Object({
-          requestId: t.String(),
-          timestamp: t.String(),
-          version: t.String(),
-          processingTime: t.Number()
-        })
-      })
-    }
-  });
+        username: t.String({
+          minLength: 3,
+          maxLength: 30,
+          pattern: '^[a-zA-Z0-9_-]+$',
+          error: 'Username must be 3-30 characters, alphanumeric and underscore only',
+        }),
+        password: t.String({
+          minLength: 12,
+          error: 'Password must be at least 12 characters long',
+        }),
+      }),
+      response: {
+        201: t.Object({
+          data: t.Object({
+            id: t.String(),
+            email: t.String(),
+            username: t.String(),
+            emailVerified: t.Boolean(),
+            preferences: t.Any(),
+            createdAt: t.String(),
+          }),
+          meta: t.Object({
+            requestId: t.String(),
+            timestamp: t.String(),
+            version: t.String(),
+            processingTime: t.Number(),
+          }),
+        }),
+      },
+    },
+  );
 ```
 
 ---
@@ -787,6 +814,7 @@ export const registerUserRoute = (app: Elysia) =>
 ### 3.1 Sub-500ms Response Time Requirements
 
 #### Caching Strategy
+
 ```typescript
 // packages/utils/src/cache-manager.ts
 export class CacheManager {
@@ -867,6 +895,7 @@ export class ActorService {
 ```
 
 #### Database Query Optimization
+
 ```typescript
 // packages/database/src/query-optimizer.ts
 export class QueryOptimizer {
@@ -922,13 +951,13 @@ export class QueryOptimizer {
           query.contentType || null,
           query.year || null,
           query.limit,
-          query.offset
+          query.offset,
         ]),
         this.database.query(countQuery, [
           query.query,
           query.contentType || null,
-          query.year || null
-        ])
+          query.year || null,
+        ]),
       ]);
 
       const searchTime = Date.now() - startTime;
@@ -936,7 +965,7 @@ export class QueryOptimizer {
       return {
         actors: actorsResult.rows,
         total: parseInt(countResult.rows[0].total),
-        searchTime
+        searchTime,
       };
     } catch (error) {
       throw new DatabaseError('Actor search failed', error);
@@ -946,6 +975,7 @@ export class QueryOptimizer {
 ```
 
 #### Connection Pooling
+
 ```typescript
 // packages/database/src/connection-pool.ts
 import { Pool } from 'pg';
@@ -959,19 +989,19 @@ export class DatabaseManager {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     max: 20, // Maximum number of connections
-    min: 5,  // Minimum number of connections
+    min: 5, // Minimum number of connections
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
     statement_timeout: 5000, // Query timeout
     query_timeout: 5000,
-    application_name: 'iknow-api'
+    application_name: 'iknow-api',
   };
 
   constructor() {
     this.pool = new Pool(this.poolConfig);
 
     // Handle pool errors
-    this.pool.on('error', (err) => {
+    this.pool.on('error', err => {
       console.error('Unexpected error on idle client', err);
     });
   }
@@ -1018,6 +1048,7 @@ export class DatabaseManager {
 ### 3.2 Mobile-First Performance
 
 #### Progressive Web App Configuration
+
 ```typescript
 // apps/web/src/pwa-config.ts
 export const PWAConfig = {
@@ -1034,44 +1065,44 @@ export const PWAConfig = {
     {
       src: '/icons/icon-72x72.png',
       sizes: '72x72',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-96x96.png',
       sizes: '96x96',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-128x128.png',
       sizes: '128x128',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-144x144.png',
       sizes: '144x144',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-152x152.png',
       sizes: '152x152',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-192x192.png',
       sizes: '192x192',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-384x384.png',
       sizes: '384x384',
-      type: 'image/png'
+      type: 'image/png',
     },
     {
       src: '/icons/icon-512x512.png',
       sizes: '512x512',
-      type: 'image/png'
-    }
-  ]
+      type: 'image/png',
+    },
+  ],
 };
 
 // Service Worker for caching
@@ -1112,6 +1143,7 @@ self.addEventListener('fetch', event => {
 ```
 
 #### Image Optimization
+
 ```typescript
 // packages/utils/src/image-optimizer.ts
 export class ImageOptimizer {
@@ -1232,6 +1264,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 ### 4.1 Backend Error Handling
 
 #### Structured Error Handling
+
 ```typescript
 // packages/utils/src/error-handler.ts
 export class APIError extends Error {
@@ -1240,7 +1273,7 @@ export class APIError extends Error {
     message: string,
     public statusCode: number = 500,
     public details?: any,
-    public cause?: Error
+    public cause?: Error,
   ) {
     super(message);
     this.name = 'APIError';
@@ -1256,13 +1289,17 @@ export class APIError extends Error {
       code: this.code,
       message: this.message,
       details: this.details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
 
 export class ValidationError extends APIError {
-  constructor(message: string, public field?: string, value?: any) {
+  constructor(
+    message: string,
+    public field?: string,
+    value?: any,
+  ) {
     super('VALIDATION_ERROR', message, 400, { field, value });
     this.name = 'ValidationError';
   }
@@ -1276,8 +1313,17 @@ export class NotFoundError extends APIError {
 }
 
 export class DatabaseError extends APIError {
-  constructor(message: string, public originalError: Error) {
-    super('DATABASE_ERROR', 'Database operation failed', 500, { originalError: originalError.message }, originalError);
+  constructor(
+    message: string,
+    public originalError: Error,
+  ) {
+    super(
+      'DATABASE_ERROR',
+      'Database operation failed',
+      500,
+      { originalError: originalError.message },
+      originalError,
+    );
     this.name = 'DatabaseError';
   }
 }
@@ -1288,13 +1334,13 @@ export const errorHandler = (error: Error) => {
     name: error.name,
     message: error.message,
     stack: error.stack,
-    cause: (error as any).cause
+    cause: (error as any).cause,
   });
 
   if (error instanceof APIError) {
     return {
       error: error.toJSON(),
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
     };
   }
 
@@ -1303,14 +1349,15 @@ export const errorHandler = (error: Error) => {
     error: {
       code: 'INTERNAL_ERROR',
       message: 'An unexpected error occurred',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     },
-    statusCode: 500
+    statusCode: 500,
   };
 };
 ```
 
 #### Service Layer Error Handling
+
 ```typescript
 // apps/api/src/services/actor-service.ts
 export class ActorService {
@@ -1322,10 +1369,7 @@ export class ActorService {
         throw new ValidationError('Invalid actor ID format', 'id', id);
       }
 
-      const result = await this.database.query(
-        'SELECT * FROM actors WHERE id = $1',
-        [id]
-      );
+      const result = await this.database.query('SELECT * FROM actors WHERE id = $1', [id]);
 
       if (result.rows.length === 0) {
         throw new NotFoundError('Actor', id);
@@ -1351,7 +1395,11 @@ export class ActorService {
       }
 
       if (query.query.length > 100) {
-        throw new ValidationError('Search query too long (max 100 characters)', 'query', query.query.length);
+        throw new ValidationError(
+          'Search query too long (max 100 characters)',
+          'query',
+          query.query.length,
+        );
       }
 
       const searchQuery = this.buildSearchQuery(query);
@@ -1359,7 +1407,7 @@ export class ActorService {
 
       return {
         actors: result.rows.map(row => this.mapRowToActorSummary(row)),
-        total: result.rows.length > 0 ? result.rows[0].total_count : 0
+        total: result.rows.length > 0 ? result.rows[0].total_count : 0,
       };
     } catch (error) {
       if (error instanceof APIError) {
@@ -1378,13 +1426,17 @@ export class ActorService {
     let paramIndex = 2;
 
     if (query.contentType) {
-      conditions.push(`EXISTS (SELECT 1 FROM filmography f JOIN content c ON f.content_id = c.id WHERE f.actor_id = a.id AND c.type = $${paramIndex})`);
+      conditions.push(
+        `EXISTS (SELECT 1 FROM filmography f JOIN content c ON f.content_id = c.id WHERE f.actor_id = a.id AND c.type = $${paramIndex})`,
+      );
       params.push(query.contentType);
       paramIndex++;
     }
 
     if (query.year) {
-      conditions.push(`EXISTS (SELECT 1 FROM filmography f JOIN content c ON f.content_id = c.id WHERE f.actor_id = a.id AND c.release_year = $${paramIndex})`);
+      conditions.push(
+        `EXISTS (SELECT 1 FROM filmography f JOIN content c ON f.content_id = c.id WHERE f.actor_id = a.id AND c.release_year = $${paramIndex})`,
+      );
       params.push(query.year);
       paramIndex++;
     }
@@ -1412,6 +1464,7 @@ export class ActorService {
 ### 4.2 Frontend Error Handling
 
 #### Error Boundaries
+
 ```typescript
 // packages/ui/src/components/error-boundary.tsx
 import React, { Component, ErrorInfo, ReactNode } from 'react';
@@ -1533,6 +1586,7 @@ const ErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({ error, r
 ```
 
 #### API Error Handling
+
 ```typescript
 // packages/ui/src/hooks/use-api-error.ts
 export const useAPIError = () => {
@@ -1548,21 +1602,21 @@ export const useAPIError = () => {
         code: apiError.code || 'UNKNOWN_ERROR',
         message: apiError.message || 'An unexpected error occurred',
         details: apiError.details,
-        timestamp: apiError.timestamp || new Date().toISOString()
+        timestamp: apiError.timestamp || new Date().toISOString(),
       });
     } else if (error.request) {
       // Network error
       setError({
         code: 'NETWORK_ERROR',
         message: 'Unable to connect to server. Please check your internet connection.',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       // Other error
       setError({
         code: 'UNKNOWN_ERROR',
         message: error.message || 'An unexpected error occurred',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }, []);
@@ -1584,18 +1638,15 @@ export class APIClient {
     this.baseURL = process.env.API_BASE_URL || '/api/v1';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json',
     };
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<APIResponse<T>> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<APIResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     const headers = {
       ...this.defaultHeaders,
-      ...options.headers
+      ...options.headers,
     };
 
     // Add request ID for tracking
@@ -1605,7 +1656,7 @@ export class APIClient {
     try {
       const response = await fetch(url, {
         ...options,
-        headers
+        headers,
       });
 
       const data = await response.json();
@@ -1622,7 +1673,7 @@ export class APIClient {
         method: options.method || 'GET',
         requestId,
         error: error.message,
-        stack: error.stack
+        stack: error.stack,
       });
 
       throw error;
@@ -1637,20 +1688,20 @@ export class APIClient {
   async post<T>(endpoint: string, data?: any): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async put<T>(endpoint: string, data?: any): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async delete<T>(endpoint: string): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
   }
 }
@@ -1663,6 +1714,7 @@ export class APIClient {
 ### 5.1 Testing Architecture
 
 #### Test Organization
+
 ```typescript
 // Root test configuration
 // tests/setup.ts
@@ -1679,7 +1731,7 @@ beforeAll(async () => {
     port: parseInt(process.env.TEST_DB_PORT || '5433'),
     database: process.env.TEST_DB_NAME || 'iknow_test',
     user: process.env.TEST_DB_USER || 'test_user',
-    password: process.env.TEST_DB_PASSWORD || 'test_password'
+    password: process.env.TEST_DB_PASSWORD || 'test_password',
   });
 
   // Run migrations
@@ -1712,12 +1764,12 @@ export const createTestActor = async (overrides: Partial<Actor> = {}): Promise<A
     bio: 'Test actor bio',
     birthDate: '1980-01-01',
     knownFor: ['Test Movie'],
-    ...overrides
+    ...overrides,
   };
 
   const result = await testDatabase.query(
     'INSERT INTO actors (name, bio, birth_date, known_for) VALUES ($1, $2, $3, $4) RETURNING *',
-    [actorData.name, actorData.bio, actorData.birthDate, actorData.knownFor]
+    [actorData.name, actorData.bio, actorData.birthDate, actorData.knownFor],
   );
 
   return result.rows[0];
@@ -1728,12 +1780,12 @@ export const createTestUser = async (overrides: Partial<User> = {}): Promise<Use
     email: 'test@example.com',
     username: 'testuser',
     passwordHash: await hashPassword('testpassword123'),
-    ...overrides
+    ...overrides,
   };
 
   const result = await testDatabase.query(
     'INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3) RETURNING *',
-    [userData.email, userData.username, userData.passwordHash]
+    [userData.email, userData.username, userData.passwordHash],
   );
 
   return result.rows[0];
@@ -1741,6 +1793,7 @@ export const createTestUser = async (overrides: Partial<User> = {}): Promise<Use
 ```
 
 #### Unit Testing Standards
+
 ```typescript
 // packages/database/src/tests/actor-model.test.ts
 import { describe, it, expect, beforeEach } from 'bun:test';
@@ -1793,7 +1846,7 @@ describe('ActorModel', () => {
       const result = await actorModel.search({
         query: 'Tom',
         limit: 10,
-        offset: 0
+        offset: 0,
       });
 
       // Assert
@@ -1825,7 +1878,7 @@ describe('ActorModel', () => {
       const result = await actorModel.search({
         query: 'NonExistentActor',
         limit: 10,
-        offset: 0
+        offset: 0,
       });
 
       // Assert
@@ -1837,6 +1890,7 @@ describe('ActorModel', () => {
 ```
 
 #### Integration Testing
+
 ```typescript
 // tests/integration/actor-api.test.ts
 import { describe, it, expect, beforeAll, afterAll } from 'bun:test';
@@ -1853,7 +1907,7 @@ describe('Actor API Integration Tests', () => {
     const testActor = await createTestActor({
       name: 'Integration Test Actor',
       bio: 'Actor created for integration testing',
-      knownFor: ['Test Movie', 'Another Test Movie']
+      knownFor: ['Test Movie', 'Another Test Movie'],
     });
     testActorId = testActor.id;
   });
@@ -1890,7 +1944,7 @@ describe('Actor API Integration Tests', () => {
     it('should search actors successfully', async () => {
       const response = await apiClient.get('/actors/search', {
         q: 'Integration Test',
-        limit: 10
+        limit: 10,
       });
 
       expect(response.error).toBeUndefined();
@@ -1908,13 +1962,13 @@ describe('Actor API Integration Tests', () => {
       const page1 = await apiClient.get('/actors/search', {
         q: 'Search Test',
         limit: 10,
-        offset: 0
+        offset: 0,
       });
 
       const page2 = await apiClient.get('/actors/search', {
         q: 'Search Test',
         limit: 10,
-        offset: 10
+        offset: 10,
       });
 
       expect(page1.data).toHaveLength(10);
@@ -1935,6 +1989,7 @@ describe('Actor API Integration Tests', () => {
 ```
 
 #### E2E Testing
+
 ```typescript
 // tests/e2e/actor-identification.spec.ts
 import { test, expect } from '@playwright/test';
@@ -2035,6 +2090,7 @@ test.describe('Actor Identification Flow', () => {
 ### 5.2 Performance Testing
 
 #### Load Testing Configuration
+
 ```typescript
 // tests/performance/load-test.ts
 import { check, sleep } from 'k6';
@@ -2046,11 +2102,11 @@ export const options = {
     { duration: '5m', target: 100 }, // Stay at 100 users
     { duration: '2m', target: 200 }, // Ramp up to 200 users
     { duration: '5m', target: 200 }, // Stay at 200 users
-    { duration: '2m', target: 0 },   // Ramp down
+    { duration: '2m', target: 0 }, // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests under 500ms
-    http_req_failed: ['rate<0.01'],   // Less than 1% failures
+    http_req_failed: ['rate<0.01'], // Less than 1% failures
   },
 };
 
@@ -2061,9 +2117,9 @@ export default function () {
   const searchResponse = http.get(`${BASE_URL}/api/v1/actors/search?q=Tom&limit=20`);
 
   check(searchResponse, {
-    'search status is 200': (r) => r.status === 200,
-    'search response time < 500ms': (r) => r.timings.duration < 500,
-    'search returns data': (r) => JSON.parse(r.body).data !== undefined,
+    'search status is 200': r => r.status === 200,
+    'search response time < 500ms': r => r.timings.duration < 500,
+    'search returns data': r => JSON.parse(r.body).data !== undefined,
   });
 
   // Test actor details endpoint
@@ -2071,9 +2127,9 @@ export default function () {
   const detailsResponse = http.get(`${BASE_URL}/api/v1/actors/${actorId}`);
 
   check(detailsResponse, {
-    'details status is 200': (r) => r.status === 200,
-    'details response time < 500ms': (r) => r.timings.duration < 500,
-    'details returns actor data': (r) => JSON.parse(r.body).data !== undefined,
+    'details status is 200': r => r.status === 200,
+    'details response time < 500ms': r => r.timings.duration < 500,
+    'details returns actor data': r => JSON.parse(r.body).data !== undefined,
   });
 
   sleep(1);
@@ -2087,6 +2143,7 @@ export default function () {
 ### 6.1 Authentication & Authorization
 
 #### JWT Implementation
+
 ```typescript
 // packages/utils/src/auth.ts
 import jwt from 'jsonwebtoken';
@@ -2169,15 +2226,14 @@ export const authMiddleware = (app: Elysia) =>
   });
 
 // Role-based authorization middleware
-export const requireSubscription = (requiredTier: string) =>
-  (app: Elysia) =>
-    app.derive(({ user, set }) => {
-      if (!user || !hasRequiredSubscription(user.subscriptionTier, requiredTier)) {
-        set.status = 403;
-        throw new APIError('SUBSCRIPTION_REQUIRED', 'Premium subscription required', 403);
-      }
-      return { user };
-    });
+export const requireSubscription = (requiredTier: string) => (app: Elysia) =>
+  app.derive(({ user, set }) => {
+    if (!user || !hasRequiredSubscription(user.subscriptionTier, requiredTier)) {
+      set.status = 403;
+      throw new APIError('SUBSCRIPTION_REQUIRED', 'Premium subscription required', 403);
+    }
+    return { user };
+  });
 
 function hasRequiredSubscription(userTier: string, requiredTier: string): boolean {
   const tiers = { free: 0, premium: 1, family: 2 };
@@ -2186,6 +2242,7 @@ function hasRequiredSubscription(userTier: string, requiredTier: string): boolea
 ```
 
 #### Rate Limiting
+
 ```typescript
 // packages/utils/src/rate-limiter.ts
 import rateLimit from 'express-rate-limit';
@@ -2211,18 +2268,18 @@ export const createRateLimiter = (options: {
       error: {
         code: 'RATE_LIMIT_EXCEEDED',
         message: options.message || 'Too many requests, please try again later',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     },
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: options.skipSuccessfulRequests || false,
-    keyGenerator: (req) => {
+    keyGenerator: req => {
       // Use IP + user ID for authenticated users
       const user = (req as any).user;
       const ip = req.ip || req.connection.remoteAddress;
       return user ? `user:${user.userId}` : `ip:${ip}`;
-    }
+    },
   });
 };
 
@@ -2230,25 +2287,26 @@ export const createRateLimiter = (options: {
 export const authRateLimit = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // 5 attempts per 15 minutes
-  message: 'Too many authentication attempts, please try again in 15 minutes'
+  message: 'Too many authentication attempts, please try again in 15 minutes',
 });
 
 export const searchRateLimit = createRateLimiter({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 60, // 60 searches per minute
-  message: 'Too many search requests, please try again in a minute'
+  message: 'Too many search requests, please try again in a minute',
 });
 
 export const generalRateLimit = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // 1000 requests per 15 minutes
-  message: 'Too many requests, please try again later'
+  message: 'Too many requests, please try again later',
 });
 ```
 
 ### 6.2 Input Validation & Sanitization
 
 #### Validation Schemas
+
 ```typescript
 // packages/utils/src/validation.ts
 import { z } from 'zod';
@@ -2256,16 +2314,22 @@ import { z } from 'zod';
 // Common validation schemas
 export const UUIDSchema = z.string().uuid('Invalid UUID format');
 
-export const EmailSchema = z.string()
+export const EmailSchema = z
+  .string()
   .email('Invalid email address')
   .max(255, 'Email address too long');
 
-export const UsernameSchema = z.string()
+export const UsernameSchema = z
+  .string()
   .min(3, 'Username must be at least 3 characters')
   .max(30, 'Username must be less than 30 characters')
-  .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens');
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Username can only contain letters, numbers, underscores, and hyphens',
+  );
 
-export const PasswordSchema = z.string()
+export const PasswordSchema = z
+  .string()
   .min(12, 'Password must be at least 12 characters long')
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
   .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
@@ -2274,30 +2338,31 @@ export const PasswordSchema = z.string()
 
 // Actor-related schemas
 export const ActorSearchSchema = z.object({
-  q: z.string()
+  q: z
+    .string()
     .min(1, 'Search query is required')
     .max(100, 'Search query too long')
     .transform(val => val.trim()),
-  limit: z.coerce.number()
+  limit: z.coerce
+    .number()
     .int('Limit must be an integer')
     .min(1, 'Limit must be at least 1')
     .max(100, 'Limit cannot exceed 100')
     .default(20),
-  offset: z.coerce.number()
+  offset: z.coerce
+    .number()
     .int('Offset must be an integer')
     .min(0, 'Offset cannot be negative')
     .default(0),
-  type: z.enum(['movie', 'series', 'all'])
-    .default('all'),
-  year: z.coerce.number()
+  type: z.enum(['movie', 'series', 'all']).default('all'),
+  year: z.coerce
+    .number()
     .int('Year must be an integer')
     .min(1888, 'Invalid year')
     .max(new Date().getFullYear() + 5, 'Year cannot be in the distant future')
     .optional(),
-  sortBy: z.enum(['relevance', 'name', 'popularity', 'year'])
-    .default('relevance'),
-  sortOrder: z.enum(['asc', 'desc'])
-    .default('desc')
+  sortBy: z.enum(['relevance', 'name', 'popularity', 'year']).default('relevance'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
 // User registration schema
@@ -2305,38 +2370,47 @@ export const UserRegistrationSchema = z.object({
   email: EmailSchema,
   username: UsernameSchema,
   password: PasswordSchema,
-  acceptTerms: z.boolean()
-    .refine(val => val === true, 'You must accept the terms of service')
+  acceptTerms: z.boolean().refine(val => val === true, 'You must accept the terms of service'),
 });
 
 // User update schema
 export const UserUpdateSchema = z.object({
   username: UsernameSchema.optional(),
-  preferences: z.object({
-    notifications: z.object({
-      newContentAlerts: z.boolean().default(true),
-      actorUpdates: z.boolean().default(true),
-      emailDigest: z.enum(['daily', 'weekly', 'monthly', 'never']).default('weekly'),
-      pushNotifications: z.boolean().default(false)
-    }).optional(),
-    privacy: z.object({
-      profileVisibility: z.enum(['public', 'private']).default('public'),
-      shareViewingHistory: z.boolean().default(false),
-      allowRecommendations: z.boolean().default(true)
-    }).optional(),
-    discovery: z.object({
-      preferredGenres: z.array(z.string()).default([]),
-      preferredDecades: z.array(z.number()).default([]),
-      avoidSpoilers: z.boolean().default(true),
-      autoDetect: z.boolean().default(true)
-    }).optional(),
-    ui: z.object({
-      theme: z.enum(['light', 'dark', 'auto']).default('auto'),
-      language: z.string().length(2).default('en'),
-      compactMode: z.boolean().default(false),
-      showRatings: z.boolean().default(true)
-    }).optional()
-  }).optional()
+  preferences: z
+    .object({
+      notifications: z
+        .object({
+          newContentAlerts: z.boolean().default(true),
+          actorUpdates: z.boolean().default(true),
+          emailDigest: z.enum(['daily', 'weekly', 'monthly', 'never']).default('weekly'),
+          pushNotifications: z.boolean().default(false),
+        })
+        .optional(),
+      privacy: z
+        .object({
+          profileVisibility: z.enum(['public', 'private']).default('public'),
+          shareViewingHistory: z.boolean().default(false),
+          allowRecommendations: z.boolean().default(true),
+        })
+        .optional(),
+      discovery: z
+        .object({
+          preferredGenres: z.array(z.string()).default([]),
+          preferredDecades: z.array(z.number()).default([]),
+          avoidSpoilers: z.boolean().default(true),
+          autoDetect: z.boolean().default(true),
+        })
+        .optional(),
+      ui: z
+        .object({
+          theme: z.enum(['light', 'dark', 'auto']).default('auto'),
+          language: z.string().length(2).default('en'),
+          compactMode: z.boolean().default(false),
+          showRatings: z.boolean().default(true),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 // Validation middleware factory
@@ -2349,14 +2423,10 @@ export const validateInput = <T>(schema: z.ZodSchema<T>) => {
         const fieldErrors = error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message,
-          received: err.received
+          received: err.received,
         }));
 
-        throw new ValidationError(
-          'Validation failed',
-          'validation',
-          fieldErrors
-        );
+        throw new ValidationError('Validation failed', 'validation', fieldErrors);
       }
       throw error;
     }
@@ -2365,17 +2435,33 @@ export const validateInput = <T>(schema: z.ZodSchema<T>) => {
 ```
 
 #### SQL Injection Prevention
+
 ```typescript
 // packages/database/src/sql-security.ts
 export class SecureQueryBuilder {
   // Only allow whitelisted columns and tables
   private static readonly ALLOWED_TABLES = new Set([
-    'actors', 'users', 'content', 'filmography', 'viewing_history', 'watchlist'
+    'actors',
+    'users',
+    'content',
+    'filmography',
+    'viewing_history',
+    'watchlist',
   ]);
 
   private static readonly ALLOWED_COLUMNS = new Set([
-    'id', 'name', 'email', 'username', 'bio', 'birth_date', 'photo_url',
-    'imdb_id', 'known_for', 'popularity_score', 'created_at', 'updated_at'
+    'id',
+    'name',
+    'email',
+    'username',
+    'bio',
+    'birth_date',
+    'photo_url',
+    'imdb_id',
+    'known_for',
+    'popularity_score',
+    'created_at',
+    'updated_at',
   ]);
 
   static buildSecureSelect(
@@ -2384,7 +2470,7 @@ export class SecureQueryBuilder {
     conditions: Record<string, any> = {},
     orderBy?: string,
     limit?: number,
-    offset?: number
+    offset?: number,
   ): { sql: string; params: any[] } {
     // Validate table name
     if (!this.ALLOWED_TABLES.has(table)) {
@@ -2453,7 +2539,7 @@ export class SecureQueryBuilder {
     searchTerm: string,
     table: string,
     searchColumn: string,
-    additionalConditions: Record<string, any> = {}
+    additionalConditions: Record<string, any> = {},
   ): { sql: string; params: any[] } {
     // Validate inputs
     if (!this.ALLOWED_TABLES.has(table)) {
@@ -2507,6 +2593,7 @@ export class SecureQueryBuilder {
 ### 7.1 Container Configuration
 
 #### Multi-stage Dockerfile
+
 ```dockerfile
 # apps/api/Dockerfile
 FROM oven/bun:1.3.1-alpine AS base
@@ -2569,6 +2656,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 #### Docker Compose for Development
+
 ```yaml
 # docker-compose.dev.yml
 version: '3.8'
@@ -2581,12 +2669,12 @@ services:
       POSTGRES_USER: dev_user
       POSTGRES_PASSWORD: dev_password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./packages/database/src/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev_user -d iknow_dev"]
+      test: ['CMD-SHELL', 'pg_isready -U dev_user -d iknow_dev']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -2594,12 +2682,12 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -2614,7 +2702,7 @@ services:
       JWT_SECRET: dev_jwt_secret_key_change_in_production
       NODE_ENV: development
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       postgres:
         condition: service_healthy
@@ -2631,7 +2719,7 @@ services:
     environment:
       API_BASE_URL: http://api:3000/api/v1
     ports:
-      - "4321:80"
+      - '4321:80'
     depends_on:
       - api
     volumes:
@@ -2663,6 +2751,7 @@ volumes:
 ### 7.2 Production Deployment
 
 #### Kubernetes Configuration
+
 ```yaml
 # k8s/namespace.yaml
 apiVersion: v1
@@ -2678,10 +2767,10 @@ metadata:
   name: iknow-config
   namespace: iknow
 data:
-  NODE_ENV: "production"
-  API_BASE_URL: "https://api.iknow.app/api/v1"
-  REDIS_HOST: "redis-service"
-  DB_HOST: "postgres-service"
+  NODE_ENV: 'production'
+  API_BASE_URL: 'https://api.iknow.app/api/v1'
+  REDIS_HOST: 'redis-service'
+  DB_HOST: 'postgres-service'
 
 ---
 # k8s/secret.yaml
@@ -2715,61 +2804,61 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:18-alpine
-        env:
-        - name: POSTGRES_DB
-          value: iknow_prod
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: iknow-secrets
-              key: DB_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: iknow-secrets
-              key: DB_PASSWORD
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:18-alpine
+          env:
+            - name: POSTGRES_DB
+              value: iknow_prod
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: iknow-secrets
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: iknow-secrets
+                  key: DB_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: '1Gi'
+              cpu: '500m'
+            limits:
+              memory: '2Gi'
+              cpu: '1000m'
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - $(POSTGRES_DB)
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - $(POSTGRES_DB)
+            initialDelaySeconds: 5
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
-            memory: "1Gi"
-            cpu: "500m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
-        livenessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -d
-            - $(POSTGRES_DB)
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -d
-            - $(POSTGRES_DB)
-          initialDelaySeconds: 5
-          periodSeconds: 5
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-storage
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 20Gi
+            storage: 20Gi
 
 ---
 # k8s/api.yaml
@@ -2789,38 +2878,38 @@ spec:
         app: api
     spec:
       containers:
-      - name: api
-        image: iknow/api:latest
-        envFrom:
-        - configMapRef:
-            name: iknow-config
-        - secretRef:
-            name: iknow-secrets
-        ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        lifecycle:
-          preStop:
-            exec:
-              command: ["/bin/sh", "-c", "sleep 15"]
+        - name: api
+          image: iknow/api:latest
+          envFrom:
+            - configMapRef:
+                name: iknow-config
+            - secretRef:
+                name: iknow-secrets
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command: ['/bin/sh', '-c', 'sleep 15']
 
 ---
 # k8s/web.yaml
@@ -2840,29 +2929,29 @@ spec:
         app: web
     spec:
       containers:
-      - name: web
-        image: iknow/web:latest
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: web
+          image: iknow/web:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: '128Mi'
+              cpu: '100m'
+            limits:
+              memory: '256Mi'
+              cpu: '200m'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
 
 ---
 # k8s/ingress.yaml
@@ -2874,40 +2963,41 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rate-limit: "100"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/rate-limit: '100'
+    nginx.ingress.kubernetes.io/rate-limit-window: '1m'
 spec:
   tls:
-  - hosts:
-    - iknow.app
-    - api.iknow.app
-    secretName: iknow-tls
+    - hosts:
+        - iknow.app
+        - api.iknow.app
+      secretName: iknow-tls
   rules:
-  - host: iknow.app
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web-service
-            port:
-              number: 80
-  - host: api.iknow.app
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: api-service
-            port:
-              number: 3000
+    - host: iknow.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+    - host: api.iknow.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 3000
 ```
 
 ### 7.3 CI/CD Pipeline
 
 #### GitHub Actions Workflow
+
 ```yaml
 # .github/workflows/deploy.yml
 name: Build and Deploy
@@ -2926,35 +3016,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
-      with:
-        bun-version: latest
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
-    - name: Install dependencies
-      run: bun install
+      - name: Install dependencies
+        run: bun install
 
-    - name: Run linting
-      run: bun run lint
+      - name: Run linting
+        run: bun run lint
 
-    - name: Run type checking
-      run: bun run type-check
+      - name: Run type checking
+        run: bun run type-check
 
-    - name: Run unit tests
-      run: bun run test:unit
+      - name: Run unit tests
+        run: bun run test:unit
 
-    - name: Run integration tests
-      run: bun run test:integration
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-        REDIS_URL: redis://localhost:6379
+      - name: Run integration tests
+        run: bun run test:integration
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379
 
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/lcov.info
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
 
   build:
     needs: test
@@ -2965,34 +3055,34 @@ jobs:
         service: [api, web, scraper]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./apps/${{ matrix.service }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy-staging:
     needs: build
@@ -3001,15 +3091,15 @@ jobs:
     environment: staging
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Deploy to staging
-      run: |
-        echo "Deploying to staging environment"
-        # Add deployment commands here
-        # kubectl apply -f k8s/ -n iknow-staging
-        # kubectl set image deployment/api api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api:${{ github.sha }} -n iknow-staging
-        # kubectl set image deployment/web web=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web:${{ github.sha }} -n iknow-staging
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment"
+          # Add deployment commands here
+          # kubectl apply -f k8s/ -n iknow-staging
+          # kubectl set image deployment/api api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api:${{ github.sha }} -n iknow-staging
+          # kubectl set image deployment/web web=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web:${{ github.sha }} -n iknow-staging
 
   deploy-production:
     needs: build
@@ -3018,15 +3108,15 @@ jobs:
     environment: production
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Deploy to production
-      run: |
-        echo "Deploying to production environment"
-        # Add production deployment commands here
-        # kubectl apply -f k8s/ -n iknow
-        # kubectl set image deployment/api api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api:${{ github.sha }} -n iknow
-        # kubectl set image deployment/web web=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web:${{ github.sha }} -n iknow
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment"
+          # Add production deployment commands here
+          # kubectl apply -f k8s/ -n iknow
+          # kubectl set image deployment/api api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api:${{ github.sha }} -n iknow
+          # kubectl set image deployment/web web=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web:${{ github.sha }} -n iknow
 
   e2e-tests:
     needs: deploy-staging
@@ -3034,33 +3124,33 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Install Playwright
-      run: npm ci
-      working-directory: ./tests/e2e
+      - name: Install Playwright
+        run: npm ci
+        working-directory: ./tests/e2e
 
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
-      working-directory: ./tests/e2e
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: ./tests/e2e
 
-    - name: Run E2E tests
-      run: npx playwright test
-      working-directory: ./tests/e2e
-      env:
-        BASE_URL: https://staging.iknow.app
+      - name: Run E2E tests
+        run: npx playwright test
+        working-directory: ./tests/e2e
+        env:
+          BASE_URL: https://staging.iknow.app
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: playwright-report
-        path: ./tests/e2e/playwright-report/
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-report
+          path: ./tests/e2e/playwright-report/
 ```
 
 ---
@@ -3070,6 +3160,7 @@ jobs:
 ### 8.1 Application Monitoring
 
 #### Health Checks
+
 ```typescript
 // apps/api/src/routes/health.ts
 export const healthCheckRoute = (app: Elysia) =>
@@ -3081,7 +3172,7 @@ export const healthCheckRoute = (app: Elysia) =>
       checkRedis(),
       checkExternalAPIs(),
       checkDiskSpace(),
-      checkMemoryUsage()
+      checkMemoryUsage(),
     ]);
 
     const results = checks.map((check, index) => {
@@ -3091,8 +3182,8 @@ export const healthCheckRoute = (app: Elysia) =>
         status: check.status,
         ...(check.status === 'rejected' && {
           error: check.reason.message,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       };
     });
 
@@ -3105,7 +3196,7 @@ export const healthCheckRoute = (app: Elysia) =>
       responseTime,
       checks: results,
       version: process.env.APP_VERSION || '1.0.0',
-      uptime: process.uptime()
+      uptime: process.uptime(),
     };
   });
 
@@ -3123,7 +3214,7 @@ async function checkRedis(): Promise<void> {
 async function checkExternalAPIs(): Promise<void> {
   // Check critical external APIs
   const response = await fetch('https://api.example.com/health', {
-    timeout: 5000
+    timeout: 5000,
   });
 
   if (!response.ok) {
@@ -3156,6 +3247,7 @@ async function checkMemoryUsage(): Promise<void> {
 ```
 
 #### Metrics Collection
+
 ```typescript
 // packages/utils/src/metrics.ts
 import prometheus from 'prom-client';
@@ -3171,43 +3263,43 @@ export const httpRequestDuration = new prometheus.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
+  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10],
 });
 
 export const httpRequestTotal = new prometheus.Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code']
+  labelNames: ['method', 'route', 'status_code'],
 });
 
 export const activeConnections = new prometheus.Gauge({
   name: 'websocket_connections_active',
-  help: 'Number of active WebSocket connections'
+  help: 'Number of active WebSocket connections',
 });
 
 export const databaseQueryDuration = new prometheus.Histogram({
   name: 'database_query_duration_seconds',
   help: 'Duration of database queries in seconds',
   labelNames: ['query_type', 'table'],
-  buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
+  buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
 });
 
 export const searchQueries = new prometheus.Counter({
   name: 'search_queries_total',
   help: 'Total number of search queries',
-  labelNames: ['query_type', 'results_count']
+  labelNames: ['query_type', 'results_count'],
 });
 
 export const cacheHits = new prometheus.Counter({
   name: 'cache_hits_total',
   help: 'Total number of cache hits',
-  labelNames: ['cache_type']
+  labelNames: ['cache_type'],
 });
 
 export const cacheMisses = new prometheus.Counter({
   name: 'cache_misses_total',
   help: 'Total number of cache misses',
-  labelNames: ['cache_type']
+  labelNames: ['cache_type'],
 });
 
 // Register metrics
@@ -3231,13 +3323,9 @@ export const metricsMiddleware = (app: Elysia) =>
       const method = request.method;
       const statusCode = set.status || 200;
 
-      httpRequestDuration
-        .labels(method, route, statusCode.toString())
-        .observe(duration);
+      httpRequestDuration.labels(method, route, statusCode.toString()).observe(duration);
 
-      httpRequestTotal
-        .labels(method, route, statusCode.toString())
-        .inc();
+      httpRequestTotal.labels(method, route, statusCode.toString()).inc();
     });
 
 function extractRoute(request: Request): string {
@@ -3257,6 +3345,7 @@ export const metricsRoute = (app: Elysia) =>
 ### 8.2 Logging Configuration
 
 #### Structured Logging
+
 ```typescript
 // packages/utils/src/logger.ts
 import winston from 'winston';
@@ -3274,9 +3363,9 @@ const customFormat = winston.format.combine(
       message,
       ...meta,
       service: process.env.SERVICE_NAME || 'iknow-api',
-      version: process.env.APP_VERSION || '1.0.0'
+      version: process.env.APP_VERSION || '1.0.0',
     });
-  })
+  }),
 );
 
 // Create logger instance
@@ -3284,7 +3373,7 @@ export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: customFormat,
   defaultMeta: {
-    service: process.env.SERVICE_NAME || 'iknow-api'
+    service: process.env.SERVICE_NAME || 'iknow-api',
   },
   transports: [
     // Error log file
@@ -3294,7 +3383,7 @@ export const logger = winston.createLogger({
       level: 'error',
       maxSize: '20m',
       maxFiles: '14d',
-      zippedArchive: true
+      zippedArchive: true,
     }),
 
     // Combined log file
@@ -3303,7 +3392,7 @@ export const logger = winston.createLogger({
       datePattern: 'YYYY-MM-DD',
       maxSize: '20m',
       maxFiles: '14d',
-      zippedArchive: true
+      zippedArchive: true,
     }),
 
     // Console output for development
@@ -3313,10 +3402,10 @@ export const logger = winston.createLogger({
         winston.format.simple(),
         winston.format.printf(({ timestamp, level, message, ...meta }) => {
           return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
-        })
-      )
-    })
-  ]
+        }),
+      ),
+    }),
+  ],
 });
 
 // Request logging middleware
@@ -3331,7 +3420,7 @@ export const requestLogger = (app: Elysia) =>
       method: request.method,
       url: request.url,
       userAgent: request.headers.get('user-agent'),
-      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
     });
 
     return {
@@ -3344,7 +3433,7 @@ export const requestLogger = (app: Elysia) =>
           requestId,
           error: error.message,
           stack: error.stack,
-          ...data
+          ...data,
         });
       },
       logResponse: (statusCode: number, data: any) => {
@@ -3354,9 +3443,9 @@ export const requestLogger = (app: Elysia) =>
           requestId,
           statusCode,
           duration,
-          ...data
+          ...data,
         });
-      }
+      },
     };
   });
 
@@ -3372,7 +3461,7 @@ export class ServiceLogger {
     logger.error(message, {
       service: this.serviceName,
       ...(error && { error: error.message, stack: error.stack }),
-      ...meta
+      ...meta,
     });
   }
 
@@ -3399,7 +3488,7 @@ export class ServiceLogger {
         const duration = Date.now() - start;
         this.error(`Failed ${operation}`, error, { duration });
         throw error;
-      }
+      },
     );
   }
 }
@@ -3422,6 +3511,7 @@ export class ActorService {
 ### 9.1 Development Standards
 
 #### Code Quality Checklist
+
 - [ ] TypeScript strict mode enabled
 - [ ] No `any` types used
 - [ ] All public methods have JSDoc comments
@@ -3434,6 +3524,7 @@ export class ActorService {
 - [ ] Accessibility compliance verified
 
 #### Git Workflow
+
 ```bash
 # Feature branch naming
 feature/user-authentication
@@ -3471,6 +3562,7 @@ test(api): add comprehensive integration tests
 ### 9.2 Performance Monitoring
 
 #### Key Performance Indicators (KPIs)
+
 - **API Response Time**: 95th percentile < 500ms
 - **Database Query Time**: 95th percentile < 100ms
 - **Search Response Time**: 95th percentile < 300ms
@@ -3481,6 +3573,7 @@ test(api): add comprehensive integration tests
 - **Time to Interactive**: < 3 seconds
 
 #### Alerting Configuration
+
 ```typescript
 // packages/utils/src/alerting.ts
 export class AlertManager {
@@ -3494,18 +3587,19 @@ export class AlertManager {
         message: 'API response time exceeding 500ms threshold',
         metric: 'api_response_time',
         value: metrics.apiResponseTime95th,
-        threshold: 500
+        threshold: 500,
       });
     }
 
     // Error rate alerts
-    if (metrics.errorRate > 0.001) { // 0.1%
+    if (metrics.errorRate > 0.001) {
+      // 0.1%
       alerts.push({
         severity: 'critical',
         message: 'Error rate exceeding 0.1% threshold',
         metric: 'error_rate',
         value: metrics.errorRate,
-        threshold: 0.001
+        threshold: 0.001,
       });
     }
 
@@ -3516,18 +3610,19 @@ export class AlertManager {
         message: 'Database query time exceeding 100ms threshold',
         metric: 'db_query_time',
         value: metrics.dbQueryTime95th,
-        threshold: 100
+        threshold: 100,
       });
     }
 
     // Cache hit rate alerts
-    if (metrics.cacheHitRate < 0.8) { // 80%
+    if (metrics.cacheHitRate < 0.8) {
+      // 80%
       alerts.push({
         severity: 'warning',
         message: 'Cache hit rate below 80% threshold',
         metric: 'cache_hit_rate',
         value: metrics.cacheHitRate,
-        threshold: 0.8
+        threshold: 0.8,
       });
     }
 
@@ -3550,32 +3645,32 @@ export class AlertManager {
               type: 'section',
               text: {
                 type: 'mrkdwn',
-                text: `*${alert.severity.toUpperCase()} Alert*`
-              }
+                text: `*${alert.severity.toUpperCase()} Alert*`,
+              },
             },
             {
               type: 'section',
               fields: [
                 {
                   type: 'mrkdwn',
-                  text: `*Metric:*\n${alert.metric}`
+                  text: `*Metric:*\n${alert.metric}`,
                 },
                 {
                   type: 'mrkdwn',
-                  text: `*Value:*\n${alert.value}`
+                  text: `*Value:*\n${alert.value}`,
                 },
                 {
                   type: 'mrkdwn',
-                  text: `*Threshold:*\n${alert.threshold}`
+                  text: `*Threshold:*\n${alert.threshold}`,
                 },
                 {
                   type: 'mrkdwn',
-                  text: `*Time:*\n${new Date().toISOString()}`
-                }
-              ]
-            }
-          ]
-        })
+                  text: `*Time:*\n${new Date().toISOString()}`,
+                },
+              ],
+            },
+          ],
+        }),
       });
     }
   }
@@ -3589,6 +3684,7 @@ export class AlertManager {
 ### 10.1 Data Protection
 
 #### Encryption Standards
+
 ```typescript
 // packages/utils/src/encryption.ts
 import crypto from 'crypto';
@@ -3601,7 +3697,8 @@ export class EncryptionService {
 
   private static getEncryptionKey(): Buffer {
     const key = process.env.ENCRYPTION_KEY;
-    if (!key || key.length !== 64) { // 64 hex chars = 32 bytes
+    if (!key || key.length !== 64) {
+      // 64 hex chars = 32 bytes
       throw new Error('Invalid encryption key');
     }
     return Buffer.from(key, 'hex');
@@ -3657,6 +3754,7 @@ export class EncryptionService {
 ```
 
 #### GDPR Compliance
+
 ```typescript
 // packages/utils/src/gdpr.ts
 export class GDPRService {
@@ -3665,14 +3763,14 @@ export class GDPRService {
     userAccounts: 365 * 7, // 7 years
     viewingHistory: 365 * 2, // 2 years
     searchHistory: 90, // 90 days
-    auditLogs: 365 * 10 // 10 years
+    auditLogs: 365 * 10, // 10 years
   };
 
   // Right to be forgotten
   static async deleteUserAllData(userId: string): Promise<void> {
     const db = new DatabaseManager();
 
-    await db.transaction(async (client) => {
+    await db.transaction(async client => {
       // Delete user data in correct order (respecting foreign keys)
       await client.query('DELETE FROM viewing_history WHERE user_id = $1', [userId]);
       await client.query('DELETE FROM watchlist WHERE user_id = $1', [userId]);
@@ -3684,7 +3782,7 @@ export class GDPRService {
     logger.info('User data deleted (GDPR request)', {
       userId,
       timestamp: new Date().toISOString(),
-      reason: 'right_to_be_forgotten'
+      reason: 'right_to_be_forgotten',
     });
   }
 
@@ -3694,8 +3792,10 @@ export class GDPRService {
 
     const [user, viewingHistory, watchlist] = await Promise.all([
       db.query('SELECT * FROM users WHERE id = $1', [userId]),
-      db.query('SELECT * FROM viewing_history WHERE user_id = $1 ORDER BY viewed_at DESC', [userId]),
-      db.query('SELECT * FROM watchlist WHERE user_id = $1 ORDER BY added_at DESC', [userId])
+      db.query('SELECT * FROM viewing_history WHERE user_id = $1 ORDER BY viewed_at DESC', [
+        userId,
+      ]),
+      db.query('SELECT * FROM watchlist WHERE user_id = $1 ORDER BY added_at DESC', [userId]),
     ]);
 
     return {
@@ -3703,7 +3803,7 @@ export class GDPRService {
       viewingHistory: viewingHistory.rows,
       watchlist: watchlist.rows,
       exportDate: new Date().toISOString(),
-      format: 'json'
+      format: 'json',
     };
   }
 
@@ -3715,12 +3815,13 @@ export class GDPRService {
       email: null,
       username: null,
       ipAddress: null,
-      userAgent: null
+      userAgent: null,
     };
   }
 
   private static hashUserId(userId: string): string {
-    return crypto.createHash('sha256')
+    return crypto
+      .createHash('sha256')
       .update(userId + process.env.ANONYMIZATION_SALT)
       .digest('hex');
   }

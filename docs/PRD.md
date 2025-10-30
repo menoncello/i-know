@@ -77,6 +77,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 **User:** Sarah, streaming enthusiast watching "Stranger Things" on Netflix
 
 **Flow:**
+
 1. **Content Detection**: Sarah starts streaming → App automatically detects content metadata via Netflix API
 2. **Actor Recognition**: Sarah sees unfamiliar actor → Opens I Know app overlay (3-seconds activation)
 3. **Instant Identification**: App displays actor profile with character name, other productions, and actor photos
@@ -84,6 +85,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 5. **Content Tracking**: Sarah marks new show as "Want to Watch" → Adds to personal watchlist
 
 **Decision Points & Alternatives:**
+
 - If automatic detection fails → Manual search option (content title + timestamp)
 - If actor not recognized → Confidence score displayed with "Report inaccuracy" option
 - If multiple actors in scene → Tap-to-select specific actor for identification
@@ -94,6 +96,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 **User:** Michael, premium subscriber looking for new content
 
 **Flow:**
+
 1. **Preference Analysis**: Michael opens app → System analyzes viewing history and saved actors
 2. **Smart Recommendations**: App displays "Because you watched X" with actor-based suggestions
 3. **Social Integration**: Michael shares actor discovery with friend → Friend receives notification with preview
@@ -101,6 +104,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 5. **Cross-Platform Sync**: Michael switches from phone to tablet → Watchlist and preferences sync automatically
 
 **Decision Points & Alternatives:**
+
 - If recommendations irrelevant → Manual preference adjustment ("Not interested in this genre/actor")
 - If sharing with non-user → Email/share link with limited preview + app download prompt
 - If multiple streaming platforms → Filter by available platforms in Michael's subscriptions
@@ -111,6 +115,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 **User:** Emma, business traveler with intermittent connectivity
 
 **Flow:**
+
 1. **Offline Preparation**: Emma downloads favorite actor profiles before flight → App caches data and images
 2. **In-Flight Usage**: Emma watches downloaded movie → Uses app with cached actor information
 3. **Delayed Sync**: Emma lands and reconnects → App automatically syncs new viewing history
@@ -118,6 +123,7 @@ I Know addresses this gap through a revolutionary IMDB data access methodology t
 5. **Notification Catch-up**: Emma receives batched notifications about new content featuring tracked actors
 
 **Decision Points & Alternatives:**
+
 - If insufficient storage → App suggests prioritizing recent/critical data for offline access
 - If cache expired → Graceful degradation with "Data may be outdated" warnings
 - If sync fails → Manual retry option with conflict resolution (local vs. remote data)
@@ -167,6 +173,7 @@ Machine learning recommendations, advanced analytics dashboard, performance moni
 ## Out of Scope
 
 **Definitely Out of Scope (Phase 1):**
+
 - Direct content streaming or distribution
 - Full social networking platform (news feeds, messaging, etc.)
 - Hardware manufacturing or custom device development
@@ -178,12 +185,14 @@ Machine learning recommendations, advanced analytics dashboard, performance moni
 - Awards show integration (Phase 2 consideration)
 
 **In Scope but Clarified:**
+
 - **Social Features:** Basic sharing, profile viewing, and follow relationships (not full social network)
 - **Partnerships:** Streaming platform API integration (not content delivery partnerships)
 - **Hardware:** Support for existing devices (not custom hardware manufacturing)
 - **Lists:** Basic watchlist and actor tracking (not advanced content creation tools)
 
 **Future Considerations (Phase 2+):**
+
 - Gaming industry actor database expansion
 - Live entertainment event integration
 - Advanced community and content creation features

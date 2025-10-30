@@ -1,0 +1,30 @@
+{
+  "name": "@i-know/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/**/*.astro src/**/*.ts",
+    "lint:fix": "eslint src/**/*.astro src/**/*.ts --fix",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "dependencies": {
+    "astro": "^5.12.0",
+    "@astrojs/react": "^4.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.3"
+  }
+}

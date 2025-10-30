@@ -24,6 +24,7 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 **Selected:** shadcn/ui - Modern, customizable React component library built on Radix UI primitives
 
 **Rationale:**
+
 - ✅ **Modern & delightful** - aligns with "delighted and surprised" emotional goal
 - ✅ **Fast development** - copy-paste components that work immediately
 - ✅ **Highly customizable** - easy to theme and modify for entertainment brand
@@ -31,6 +32,7 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 - ✅ **Performance optimized** - works perfectly with Astro framework
 
 **Custom Components Needed:**
+
 - ActorCard - Enhanced card with viewing history and connections
 - ContentBanner - Gradient banners for current content
 - DiscoveryGrid - Actor grid with visual indicators
@@ -39,12 +41,14 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 ### 1.2 Color System: Premiere Green Theme
 
 **Primary Colors:**
+
 - Primary: `#059669` (emerald-600) - main actions, CTAs
 - Primary Dark: `#047857` (emerald-700) - hover states
 - Secondary: `#0891b2` (cyan-600) - secondary actions
 - Accent: `#dc2626` (red-600) - destructive actions
 
 **Semantic Colors:**
+
 - Success: `#10b981` (emerald-500) - positive feedback
 - Warning: `#f59e0b` (amber-500) - cautions
 - Error: `#ef4444` (red-500) - errors
@@ -53,6 +57,7 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 **Dark Mode Support:** Full dark theme with inverted color mappings while maintaining accessibility contrast ratios.
 
 **Interactive Visualizations:**
+
 - Color Theme Explorer: [ux-color-themes.html](./ux-color-themes.html)
 - Live component examples in all themes
 - Side-by-side comparison and semantic color usage
@@ -74,16 +79,19 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 ### 2.2 Novel UX Patterns
 
 **"Maybe you know them from..." Intelligence:**
+
 - Proactive display of user's viewing history with actors
 - Contextual connections before user action
 - Smart recommendations based on personal viewing patterns
 
 **Progressive Information Disclosure:**
+
 - Immediate actor identification → detailed filmography → personalized recommendations
 - Avoids information overload while maximizing discovery value
 - Maintains flow state during entertainment consumption
 
 **Zero-Effort Content Detection:**
+
 - Automatic recognition of current viewing content
 - Background processing without user intervention
 - Seamless integration with streaming experience
@@ -97,18 +105,21 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 **Theme Personality:** Fresh, intelligent, accessible - perfect for mainstream adoption while maintaining expert appeal.
 
 **Visual Hierarchy:**
+
 - **Emerald gradients** for primary content and actions
 - **Cyan accents** for secondary interactions and insights
 - **Amber highlights** for recommendations and discoveries
 - **Professional grays** for supporting information
 
 **Typography:**
+
 - **Inter** or **System UI** fonts for optimal readability
 - **Bold weights** for emphasis on actor names and CTAs
 - **Consistent sizing** following 8pt grid system
 - **High contrast** ratios for accessibility compliance
 
 **Spacing System:**
+
 - **Base unit:** 4px for consistent spacing
 - **Scale:** 4, 8, 12, 16, 24, 32, 48, 64px
 - **Layout grid:** 12-column system with responsive breakpoints
@@ -123,18 +134,21 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 **Selected:** Rich Dashboard - Information-rich interface for entertainment enthusiasts who want comprehensive insights and deep discovery capabilities.
 
 **Rationale:**
+
 - **Data Density:** Appeals to entertainment enthusiasts who love being experts
 - **Intelligence Features:** Smart insights, viewing statistics, personalized recommendations
 - **Expert Positioning:** Makes users feel like entertainment industry insiders
 - **Monetization Support:** Premium features naturally integrate with data-rich experience
 
 **Key Characteristics:**
+
 - **Information-dense** but organized layouts
 - **Analytics and insights** prominently displayed
 - **Smart recommendations** based on viewing history
 - **Professional aesthetic** maintaining accessibility
 
 **Interactive Mockups:**
+
 - Design Direction Showcase: [ux-design-directions.html](./ux-design-directions.html)
 - Full mobile screen mockups with live interactions
 - Dark mode demonstrations in all components
@@ -181,12 +195,14 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
    - Success: User feels like entertainment expert
 
 **Success Metrics:**
+
 - **Time Savings:** 3 seconds vs 5-10 minutes manual search
 - **Recognition Accuracy:** >95% correct identification
 - **User Satisfaction:** Net Promoter Score >8
 - **Feature Adoption:** 80% of users utilize core features
 
 **Interactive Journey Visualization:**
+
 - Complete journey demonstration: [ux-user-journey.html](./ux-user-journey.html)
 - Step-by-step mobile mockups with animations
 - Success metrics and impact visualization
@@ -198,6 +214,7 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 ### 6.1 Component Strategy
 
 **Base shadcn/ui Components:**
+
 - **Card** - Actor profiles, viewing history, content recommendations
 - **Badge** - Status indicators, viewing history markers
 - **Avatar** - Actor avatars with fallback initials
@@ -209,48 +226,53 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 **Custom Entertainment Components:**
 
 **ActorCard Component:**
+
 ```tsx
 interface ActorCardProps {
-  actor: Actor
-  isKnown?: boolean
-  viewingHistory?: ViewingHistory[]
-  onClick?: () => void
-  showConnections?: boolean
-  compact?: boolean
+  actor: Actor;
+  isKnown?: boolean;
+  viewingHistory?: ViewingHistory[];
+  onClick?: () => void;
+  showConnections?: boolean;
+  compact?: boolean;
 }
 ```
 
 **ContentBanner Component:**
+
 ```tsx
 interface ContentBannerProps {
-  content: Content
-  isActive?: boolean
-  showProgress?: boolean
-  userProgress?: number
+  content: Content;
+  isActive?: boolean;
+  showProgress?: boolean;
+  userProgress?: number;
 }
 ```
 
 **DiscoveryGrid Component:**
+
 ```tsx
 interface DiscoveryGridProps {
-  actors: Actor[]
-  userHistory: ViewingHistory[]
-  onActorSelect: (actor: Actor) => void
-  layout: 'compact' | 'detailed'
+  actors: Actor[];
+  userHistory: ViewingHistory[];
+  onActorSelect: (actor: Actor) => void;
+  layout: 'compact' | 'detailed';
 }
 ```
 
 **ViewingHistory Component:**
+
 ```tsx
 interface ViewingHistoryProps {
-  history: ViewingHistory[]
-  actor: Actor
-  showInsights?: boolean
-  compact?: boolean
+  history: ViewingHistory[];
+  actor: Actor;
+  showInsights?: boolean;
+  compact?: boolean;
 }
 ```
 
 **Implementation Priority:**
+
 1. **Phase 1:** Core components (ActorCard, ContentBanner, DiscoveryGrid)
 2. **Phase 2:** Enhancement components (ViewingHistory, SmartInsights)
 3. **Phase 3:** Advanced features (Analytics, Recommendations)
@@ -262,36 +284,42 @@ interface ViewingHistoryProps {
 ### 7.1 Consistency Rules
 
 **Button Hierarchy:**
+
 - **Primary:** Emerald-600 background, white text, rounded-lg
 - **Secondary:** Cyan-600 background, white text, rounded-lg
 - **Tertiary:** Gray-200 background, gray-700 text, rounded-lg
 - **Destructive:** Red-600 background, white text, rounded-lg
 
 **Feedback Patterns:**
+
 - **Success:** Emerald-50 background, emerald-800 text, toast notifications (4s)
 - **Error:** Red-50 background, red-800 text, inline alerts (manual dismiss)
 - **Warning:** Amber-50 background, amber-800 text, banner alerts (8s)
 - **Info:** Blue-50 background, blue-800 text, inline tips
 
 **Form Patterns:**
-- **Labels:** Above input, bold weight, required indicator (*)
+
+- **Labels:** Above input, bold weight, required indicator (\*)
 - **Validation:** On blur (standard), on change (real-time)
 - **Errors:** Red-500 border, red-600 text, inline messages
 - **Help Text:** Gray-500 text, small size, below inputs
 
 **Modal Patterns:**
+
 - **Sizes:** Small (320px), Medium (480px), Large (640px), Full screen
 - **Dismiss:** Click outside, escape key, explicit close button
 - **Focus:** Auto-focus first input, trap focus within modal
 - **Stacking:** Maximum 2 modals, visual hierarchy maintained
 
 **Navigation Patterns:**
+
 - **Active State:** Emerald-100 background, bold text, underline indicator
 - **Breadcrumbs:** Horizontal layout, ">" separator, clickable except current
 - **Back Button:** Browser back respected, app back for in-app flows
 - **Deep Linking:** All shareable URLs with journey preservation
 
 **Search Patterns:**
+
 - **Trigger:** Auto-search after 3 characters, manual on submit
 - **Results:** Instant dropdown (top 5), full page on submit
 - **Filters:** Collapsible panel, active filter badges, clear all option
@@ -304,12 +332,14 @@ interface ViewingHistoryProps {
 ### 8.1 Responsive Strategy
 
 **Mobile-First Breakpoints:**
+
 - **Mobile:** < 640px (375px-390px focus) - Single column, stacked cards
 - **Tablet:** 640px-1024px (768px-834px focus) - Two columns, side navigation
 - **Desktop:** > 1024px (1366px+ typical) - Multi-column, persistent sidebar
 - **Large Desktop:** > 1536px - Enhanced layouts, rich visualizations
 
 **Component Responsive Behavior:**
+
 ```
 Actor Cards:
 Mobile: 100% width, full info
@@ -333,35 +363,41 @@ Desktop: 4 columns (add Discovery Rate)
 **WCAG 2.1 AA Compliance:**
 
 **Visual Accessibility:**
+
 - **Color Contrast:** 4.5:1 minimum ratio, verified with contrast checker
 - **Font Sizes:** Minimum 16px for body text, 14px minimum for labels
 - **Touch Targets:** Minimum 44x44px for all interactive elements
 - **Focus Indicators:** 2px emerald outline, visible on all interactive states
 
 **Keyboard Navigation:**
+
 - **Tab Order:** Logical navigation through all interactive elements
 - **Skip Links:** "Skip to main content" for screen readers
 - **Keyboard Shortcuts:** Ctrl+K (search), Ctrl+/ (shortcuts), Escape (close)
 - **Focus Management:** Visible focus states, trap focus in modals
 
 **Screen Reader Support:**
+
 - **ARIA Labels:** Meaningful labels for all interactive elements
 - **Semantic HTML:** Proper heading hierarchy (h1-h6)
 - **Live Regions:** Dynamic content announcements
 - **Image Alt Text:** Descriptive text for actor photos, content posters
 
 **Motion & Animation:**
+
 - **Reduced Motion:** Respect prefers-reduced-motion media query
 - **Animation Duration:** Maximum 0.3s for transitions
 - **Auto-play:** No auto-playing videos/animations
 - **Pause Controls:** User control over all animations
 
 **Platform Optimizations:**
+
 - **iOS:** Safe areas, haptic feedback, native sharing
 - **Android:** Material touch ripples, back button handling
 - **Desktop:** Hover states, keyboard shortcuts, drag & drop
 
 **Testing Strategy:**
+
 - **Responsive:** Real devices on all breakpoints, orientations, zoom
 - **Accessibility:** axe DevTools, VoiceOver/TalkBack/NVDA testing
 - **Performance:** Core Web Vitals, network throttling, memory monitoring
@@ -441,9 +477,9 @@ This UX Design Specification serves as input to:
 
 ### Version History
 
-| Date | Version | Changes | Author |
-|------|---------|----------|---------|
-| 2025-10-29 | 1.0 | Initial UX Design Specification | Eduardo Menoncello |
+| Date       | Version | Changes                         | Author             |
+| ---------- | ------- | ------------------------------- | ------------------ |
+| 2025-10-29 | 1.0     | Initial UX Design Specification | Eduardo Menoncello |
 
 ---
 
@@ -462,4 +498,4 @@ This UX Design Specification represents **world-class entertainment intelligence
 
 ---
 
-*This UX Design Specification was created through collaborative design facilitation, not template generation. All decisions were made with user input and are documented with rationale.*
+_This UX Design Specification was created through collaborative design facilitation, not template generation. All decisions were made with user input and are documented with rationale._

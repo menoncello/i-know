@@ -1,10 +1,11 @@
 installation:
   version: 6.0.0-alpha.0
-  installDate: '2025-10-29T03:30:42.035Z'
-  lastUpdated: '2025-10-29T03:30:42.035Z'
+  installDate: '2025-10-30T13:06:25.975Z'
+  lastUpdated: '2025-10-30T13:06:25.975Z'
 modules:
   - core
   - bmm
+  - core
   - core
   - core
 ides:

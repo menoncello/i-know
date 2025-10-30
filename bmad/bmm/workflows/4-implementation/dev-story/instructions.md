@@ -200,7 +200,38 @@ Expected ready-for-dev or in-progress. Continuing anyway...
     <action if="no tasks remain"><goto step="6">Completion</goto></action>
   </step>
 
-  <step n="6" goal="Story completion and mark for review" tag="sprint-status">
+  <step n="4" goal="Mandatory Quality Gates Validation" tag="quality-gates">
+    <critical>QUALITY VALIDATION IS MANDATORY - ALL substeps must pass with ZERO errors</critical>
+    <critical>NEVER add eslint-disable comments or @ts-ignore/@ts-expect-error - fix the underlying code issues</critical>
+
+    <substep n="4.1" goal="TypeScript type checking">
+      <action>Run: bun run type-check</action>
+      <check>TypeScript compilation with ZERO errors required</check>
+      <critical>Fix all type errors - no exceptions, no @ts-ignore allowed</critical>
+    </substep>
+
+    <substep n="4.2" goal="ESLint validation">
+      <action>Run: bun run lint</action>
+      <check>ESLint validation with ZERO errors required</check>
+      <critical>Fix all linting errors - no eslint-disable comments allowed</critical>
+    </substep>
+
+    <substep n="4.3" goal="Code formatting check">
+      <action>Run: bun run format:check</action>
+      <check>Code must be properly formatted with ZERO issues</check>
+      <critical>Run bun run format to fix formatting issues</critical>
+    </substep>
+
+    <substep n="4.4" goal="Test execution">
+      <action>Run: bun run test</action>
+      <check>All tests must pass with 100% success rate</check>
+      <critical>Fix failing tests before proceeding</critical>
+    </substep>
+
+    <action if="any quality gate fails">STOP and resolve ALL quality issues before continuing</action>
+  </step>
+
+  <step n="5" goal="Story completion and mark for review" tag="sprint-status">
     <action>Verify ALL tasks and subtasks are marked [x] (re-scan the story document now)</action>
     <action>Run the full regression suite (do not skip)</action>
     <action>Confirm File List includes every changed file</action>
@@ -226,7 +257,7 @@ Story is marked Ready for Review in file, but sprint-status.yaml may be out of s
     <action if="File List is incomplete">Update it before completing</action>
   </step>
 
-  <step n="7" goal="Completion communication and user support">
+  <step n="6" goal="Completion communication and user support">
     <action>Optionally run the workflow validation task against the story using {project-root}/bmad/core/tasks/validate-workflow.xml</action>
     <action>Prepare a concise summary in Dev Agent Record → Completion Notes</action>
 

@@ -1,0 +1,145 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1</storyId>
+    <title>Project Setup and Development Infrastructure</title>
+    <status>drafted</status>
+    <generatedAt>2025-10-30T00:00:00Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/1-1-project-setup-and-development-infrastructure.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>development team</asA>
+    <iWant>a complete project infrastructure with CI/CD, version control, and development environment</iWant>
+    <soThat>we can build and deploy the application efficiently and reliably</soThat>
+    <tasks>- Initialize monorepo structure with Turborepo (AC: 1)
+- Setup core applications (web, api, scraper) (AC: 1, 3)
+- Configure development environment (AC: 3)
+- Implement code quality and testing infrastructure (AC: 2, 4)
+- Build CI/CD pipeline with GitHub Actions (AC: 2)
+- Create development documentation and deployment guides (AC: 5, 6)</tasks>
+  </story>
+
+  <acceptanceCriteria>1. Repository initialized with proper branching strategy (main, develop, feature branches)
+2. CI/CD pipeline configured with automated testing and deployment
+3. Development environment setup with local database and API simulation
+4. Code quality tools configured (linting, formatting, security scanning)
+5. Documentation for development workflow and deployment procedures
+6. Environment-specific configuration management (development, staging, production)</acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/architecture.md" title="I Know - Decision Architecture" section="Project Initialization">
+        Monorepo Setup: Turborepo 2.5.9 chosen for optimized builds and dependency management. Project initialization combines Turborepo's optimized build infrastructure with custom technology stack and architectural patterns.
+      </doc>
+      <doc path="docs/architecture.md" title="I Know - Decision Architecture" section="Project Structure">
+        Complete monorepo structure with apps/web (Astro + React), apps/api (Elysia), apps/scraper (Bun), and packages/ui, types, database, utils. Testing at root level with E2E and integration tests.
+      </doc>
+      <doc path="docs/architecture.md" title="I Know - Decision Architecture" section="Implementation Patterns">
+        Naming patterns: Database tables snake_case plural, API routes kebab-case with versioning, Components PascalCase, Files kebab-case with technology suffix. Structure patterns for frontend, backend, and shared components.
+      </doc>
+      <doc path="docs/architecture.md" title="I Know - Decision Architecture" section="Development Environment">
+        Prerequisites: Bun 1.1.38+, Node.js 20+, PostgreSQL 16+, Git, VS Code. Setup commands for clone, install, environment, database, development servers, testing, and building.
+      </doc>
+      <doc path="docs/architecture.md" title="I Know - Decision Architecture" section="CI/CD Pipeline">
+        GitHub Actions configuration with test job (setup, install, test, lint) and deploy job. Automated testing workflow on pull requests with Railway deployment.
+      </doc>
+      <doc path="docs/epics.md" title="I Know - Epic Breakdown" section="Epic 1: Foundation &amp; Infrastructure">
+        Goal: Establish project infrastructure, development workflow, and core mobile application foundation with user authentication and basic IMDB data pipeline. Story 1.1 acceptance criteria and prerequisites.
+      </doc>
+      <doc path="docs/PRD.md" title="I Know Product Requirements Document (PRD)" section="Epic List">
+        Epic 1: Foundation &amp; Infrastructure with 8-10 stories for project setup, CI/CD, basic architecture, user authentication system, basic IMDB data pipeline, core mobile app shell.
+      </doc>
+    </docs>
+    <code>
+      <!-- No existing code found - this is the first story -->
+    </code>
+    <dependencies>
+      <dependency ecosystem="monorepo-management" package="turborepo" version="2.5.9">
+        Optimized builds and dependency management (Latest stable as of 2025-10-29)
+      </dependency>
+      <dependency ecosystem="runtime" package="bun" version="1.3.1">
+        Ultra-fast performance, all-in-one tooling
+      </dependency>
+      <dependency ecosystem="frontend-framework" package="astro" version="5.12.0">
+        Performance optimized, SEO-friendly, islands architecture
+      </dependency>
+      <dependency ecosystem="ui-components" package="shadcn/ui" version="3.5.0">
+        Modern, accessible, matches rich dashboard design
+      </dependency>
+      <dependency ecosystem="backend-framework" package="elysia" version="1.4.13">
+        Type-safe, modern, excellent Bun integration
+      </dependency>
+      <dependency ecosystem="database" package="postgresql" version="18.0">
+        Scalable, reliable, supports complex queries
+      </dependency>
+      <dependency ecosystem="react" package="react" version="19.2.0">
+        Latest stable version with compiler support
+      </dependency>
+      <dependency ecosystem="typescript" package="typescript" version="5.9.3">
+        Strict mode, latest features, no any types
+      </dependency>
+      <dependency ecosystem="css-framework" package="tailwindcss" version="4.1.16">
+        Modern utility-first framework with v4 improvements
+      </dependency>
+      <dependency ecosystem="scraper" package="puppeteer" version="23.8.0">
+        Fallback scraper technology
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint id="monorepo-structure">
+      Use Turborepo for monorepo management with apps/ and packages/ structure. Apps: web (Astro), api (Elysia), scraper (Bun). Packages: ui, types, database, utils.
+    </constraint>
+    <constraint id="naming-conventions">
+      Database tables: snake_case plural. API routes: kebab-case with versioning. Components: PascalCase. Files: kebab-case with technology suffix. Variables: camelCase.
+    </constraint>
+    <constraint id="code-quality">
+      TypeScript strict mode enabled. ESLint + Prettier configured. No any types allowed. Follow consistency rules from architecture.md.
+    </constraint>
+    <constraint id="branching-strategy">
+      Repository initialized with proper branching strategy: main, develop, feature branches. Follow Git flow patterns.
+    </constraint>
+    <constraint id="database-connection">
+      Connect to existing PostgreSQL Docker instance. Use environment-specific .env files for configuration management.
+    </constraint>
+    <constraint id="testing-structure">
+      Use Bun test framework. Co-located tests structure. Unit tests in each app, integration and E2E tests at root level.
+    </constraint>
+  </constraints>
+
+  <interfaces>
+    <!-- No existing interfaces found - this story establishes the foundation -->
+  </interfaces>
+
+  <tests>
+    <standards>
+      Use Bun test framework with strict TypeScript mode. Co-located tests structure with clear separation between unit, integration, and E2E tests. Test coverage requirements and quality gates to be established.
+    </standards>
+    <locations>
+      Unit tests: apps/*/tests/ directories
+      Integration tests: tests/integration/
+      E2E tests: tests/e2e/
+      Performance tests: tests/performance/
+    </locations>
+    <ideas>
+      <test idea="monorepo-setup" ac="1">
+        Verify Turborepo configuration works correctly and builds all apps successfully
+      </test>
+      <test idea="development-environment" ac="3">
+        Test database connection to existing PostgreSQL instance and environment variable loading
+      </test>
+      <test idea="code-quality-tools" ac="4">
+        Verify ESLint and Prettier configurations work and enforce coding standards
+      </test>
+      <test idea="cicd-pipeline" ac="2">
+        Test GitHub Actions workflow triggers and executes successfully on pull requests
+      </test>
+      <test idea="documentation-completeness" ac="5">
+        Verify README and setup documentation enables new developers to onboard successfully
+      </test>
+    </ideas>
+  </tests>
+</story-context>

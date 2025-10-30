@@ -1,0 +1,40 @@
+# Build outputs
+dist/
+build/
+.turbo/
+.next/
+
+# Dependencies
+node_modules/
+
+# Generated files
+coverage/
+*.min.js
+*.min.css
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.eslintcache
+
+# Environment files
+.env*
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Lock files (prettier doesn't need to format these)
+package-lock.json
+pnpm-lock.yaml
+bun.lockb

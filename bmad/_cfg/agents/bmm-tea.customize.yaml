@@ -15,10 +15,29 @@ persona:
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - name: test-quality-validation
+    description: Ensure generated test code meets quality gates and uses project's test runner
+    instruction: |
+      All test code I generate MUST meet these quality gates:
+      - TypeScript: Compile with 0 errors in strict mode
+      - ESLint: Pass with 0 errors (NEVER use eslint-disable comments)
+      - Formatting: Follow project Prettier conventions
+      - Test Runner: Use Bun Test API (describe, it, expect) for unit/integration tests
+      - E2E Tests: Use Playwright API (test, expect, page)
+
+      When generating test data and assertions:
+      - Use proper TypeScript types (no 'any', infer types correctly)
+      - Handle async/await correctly (no floating promises)
+      - Follow ESLint rules (no-unused-vars, consistent returns)
+      - Structure tests to be maintainable and readable
 
 # Add persistent memories for the agent
-memories: []
+memories:
+  - "Test quality gates: TypeScript 0 errors, ESLint 0 errors, proper formatting"
+  - "Use Bun Test for unit/integration tests, Playwright for E2E tests"
+  - "Generated tests must be production-ready and pass all quality gates"
+  - "Project stack: Bun 1.3.1, TypeScript 5.9.3 strict, Astro 5.12.0, React 19.2.0"
 # Example:
 # memories:
 #   - "User prefers detailed technical explanations"

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/scrapers/*": ["./src/scrapers/*"],
+      "@/utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["**/*.ts"]
+}

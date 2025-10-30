@@ -210,6 +210,25 @@ Will update existing story file rather than creating new one.
     <template-output file="{default_output_file}">change_log</template-output>
   </step>
 
+  <step n="7.5" goal="Validate Code Examples Quality">
+    <action>Extract all code examples from story content</action>
+    <action>Validate TypeScript compilation for each example</action>
+    <action>Validate ESLint compliance for each example</action>
+    <action>Validate formatting compliance for each example</action>
+    <check if="any code example fails quality validation">
+      <output>❌ CODE EXAMPLE QUALITY ISSUES:
+      Code examples must meet production quality standards:
+      - TypeScript: 0 compilation errors
+      - ESLint: 0 validation errors
+      - Formatting: 0 issues
+
+      Fix code examples before saving story.
+      </output>
+      <action>Request fixes for code example quality issues</action>
+      <action>HALT until code examples meet quality standards</action>
+    </check>
+  </step>
+
   <step n="8" goal="Validate, save, and mark story drafted" tag="sprint-status">
     <invoke-task>Validate against checklist at {installed_path}/checklist.md using bmad/core/tasks/validate-workflow.xml</invoke-task>
     <action>Save document unconditionally (non-interactive default). In interactive mode, allow user confirmation.</action>

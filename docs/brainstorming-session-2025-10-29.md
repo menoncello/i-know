@@ -9,14 +9,17 @@
 ## 🎯 Project Vision Confirmed
 
 ### Core Problem Statement
+
 **Primary Pain Point:** "Frustração cognitiva + desperdício de tempo ao reconhecer atores entre diferentes produções"
 
 Users experience mental interruption when watching series/films, thinking "I recognize that actor from somewhere else" but unable to make the connection quickly, leading to:
+
 - "Matutação mental" (involuntary cognitive processing)
 - Interrupption of immersive viewing experience
 - Time wasted searching through IMDB's cluttered interface
 
 ### Core Value Proposition
+
 **Instant contextual actor connections that eliminate cognitive friction**
 
 ---
@@ -24,9 +27,11 @@ Users experience mental interruption when watching series/films, thinking "I rec
 ## 🚀 Technical Breakthrough Discovery
 
 ### Revolutionary Scrapering Strategy
+
 **Finding:** IMDB provides complete structured data via simple HTTP GET requests
 
 **Data Sources Available:**
+
 1. **JSON-LD Structured Data** (embedded in HTML)
    - Episode metadata (title, description, genre, rating)
    - Complete production details
@@ -45,6 +50,7 @@ Users experience mental interruption when watching series/films, thinking "I rec
    - Complete filmography via actor profile links
 
 **Technical Impact:** Eliminates need for complex Puppeteer/browser automation
+
 - Single HTTP requests provide all necessary data
 - 100x faster than traditional web scraping
 - Fully scalable and maintainable
@@ -54,6 +60,7 @@ Users experience mental interruption when watching series/films, thinking "I rec
 ## 🎨 Product Features Prioritized
 
 ### MVP Features (Confirmed)
+
 1. **Automatic Content Detection**
    - Integration with TV remote/metadata APIs
    - Zero-effort content identification
@@ -74,6 +81,7 @@ Users experience mental interruption when watching series/films, thinking "I rec
    - Personal viewing history
 
 ### Post-MVP Features (Roadmap)
+
 1. **Advanced Image Recognition**
    - Photo upload for actor identification
    - Scene-specific actor capture
@@ -98,12 +106,14 @@ Users experience mental interruption when watching series/films, thinking "I rec
 ## 🛠️ Technical Architecture Validated
 
 ### Technology Stack Confirmed
+
 - **Backend:** Bun + Elysia (API server)
 - **Frontend:** Astro + React (modern web app)
 - **Database:** PostgreSQL (relational actor/production mapping)
 - **Infrastructure:** Daily batch updates with caching strategy
 
 ### Data Model Design
+
 ```sql
 -- Core entities identified through scraping analysis
 Productions (series/films)
@@ -119,6 +129,7 @@ Actors
 ```
 
 ### Scraping Strategy Optimized
+
 **Phase 1:** Episode-level data extraction (single HTTP GET)
 **Phase 2:** Cast member avatar collection (single HTTP GET)
 **Phase 3:** Individual actor filmography (targeted HTTP GETs)
@@ -129,6 +140,7 @@ Actors
 ## 💡 Innovation Opportunities Identified
 
 ### Unique Differentiators
+
 1. **Context-Aware Connections**
    - Not just "same actor" but "same actor in similar roles/genres"
    - Era-specific connections (actors' career phases)
@@ -145,6 +157,7 @@ Actors
    - Viewing pattern analysis
 
 ### Monetization Potential
+
 - Premium features (advanced analytics, early access)
 - Affiliate partnerships (streaming service integration)
 - Data insights for entertainment industry
@@ -155,17 +168,20 @@ Actors
 ## 🎯 Success Metrics Defined
 
 ### User Engagement Metrics
+
 - **Primary:** Time saved in actor identification (target: <3 seconds)
 - **Secondary:** Daily active users, session duration, return rate
 - **Tertiary:** List creation/sharing frequency, connection discovery rate
 
 ### Technical Performance Metrics
+
 - **Scraping Accuracy:** >95% data extraction success
 - **Response Time:** <500ms for connection queries
 - **Update Freshness:** Daily data refresh, <24h latency
 - **Uptime:** >99.5% availability
 
 ### Business Impact Metrics
+
 - **User Satisfaction:** Net Promoter Score target >8
 - **Content Coverage:** >90% of major streaming platforms
 - **Feature Adoption:** 80% of users utilize core connection features
@@ -175,12 +191,14 @@ Actors
 ## 🚦 Implementation Decision Gates
 
 ### Critical Success Factors
+
 1. **Scraping Reliability:** Must maintain consistent IMDB data access
 2. **User Experience:** Seamless integration with existing viewing habits
 3. **Performance:** Sub-second response times for all features
 4. **Data Accuracy:** >99% correct actor/production relationships
 
 ### Risk Mitigation Strategies
+
 1. **IMDB Access:** Multiple fallback scraping strategies
 2. **Legal Compliance:** Data usage within fair use guidelines
 3. **Performance:** Caching and CDN strategies for global scale
@@ -191,12 +209,14 @@ Actors
 ## ✅ Brainstorming Session Conclusion
 
 **Project Validation:** CONFIRMED ✅
+
 - Technical feasibility established through real-world testing
 - Clear user value proposition identified
 - Scalable architecture designed
 - Comprehensive feature roadmap defined
 
 **Next Steps:**
+
 1. Proceed to Product Brief creation for formal documentation
 2. Initiate Technical Specification development
 3. Begin PRD (Product Requirements Document) process
@@ -206,6 +226,6 @@ Actors
 
 ---
 
-*Generated through structured brainstorming methodology*
-*Technical validation performed via live IMDB testing*
-*Ready for product development phase*
+_Generated through structured brainstorming methodology_
+_Technical validation performed via live IMDB testing_
+_Ready for product development phase_

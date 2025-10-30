@@ -15,10 +15,24 @@ persona:
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - name: template-quality
+    description: Ensure story templates demonstrate correct patterns and meet production quality
+    instruction: |
+      Story templates and code examples must demonstrate correct patterns and meet production quality standards:
+      - Proper TypeScript types (strict mode, no any types)
+      - ESLint compliance (0 errors)
+      - Correct formatting (Prettier)
+      - Use project's test runner patterns (Bun Test)
+      - Examples must be copy-paste ready
+
+      Templates guide developers - they must exemplify best practices and be immediately usable.
 
 # Add persistent memories for the agent
-memories: []
+memories:
+  - "Story templates must be production-ready and demonstrate correct patterns"
+  - "Use Bun Test patterns in test examples, not Jest or Vitest"
+  - "Quality standards: TypeScript 0 errors, ESLint 0 errors, Formatting 100%"
 # Example:
 # memories:
 #   - "User prefers detailed technical explanations"

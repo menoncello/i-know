@@ -11,6 +11,7 @@ I Know is an entertainment intelligence platform that eliminates cognitive frict
 **STATER TEMPLATE SELECTION**: Turborepo 2.5.9 chosen for optimized builds and dependency management
 
 **PROVIDED BY TURBOREPO STARTER**:
+
 - Basic monorepo structure with apps/ and packages/ directories
 - PNPM workspace configuration
 - turbo.json build pipeline configuration
@@ -18,6 +19,7 @@ I Know is an entertainment intelligence platform that eliminates cognitive frict
 - Dependency hoisting
 
 **CUSTOM ARCHITECTURAL DECISIONS**:
+
 - Technology stack selection (Bun + Elysia + Astro)
 - File organization patterns
 - TypeScript strict mode enforcement
@@ -72,20 +74,20 @@ This combines Turborepo's optimized build infrastructure with our custom technol
 
 ## Decision Summary
 
-| Category | Decision | Version | Affects Epics | Rationale |
-| -------- | -------- | ------- | ------------- | --------- |
-| **Monorepo Management** | Turborepo | 2.5.9 | All | Optimized builds and dependency management (Latest stable as of 2025-10-29) |
-| **Frontend Framework** | Astro | 5.12.0 | All | Performance optimized, SEO-friendly, islands architecture (Latest stable as of 2025-10-29) |
-| **UI Components** | shadcn/ui | 3.5.0 | All | Modern, accessible, matches rich dashboard design |
-| **Backend Framework** | Elysia | 1.4.13 | All | Type-safe, modern, excellent Bun integration (Latest stable as of 2025-10-29) |
-| **Runtime** | Bun | 1.3.1 | All | Ultra-fast performance, all-in-one tooling |
-| **Database** | PostgreSQL | 18.0 | All | Scalable, reliable, supports complex queries (Latest stable released 2025-09-25) |
-| **React Version** | React | 19.2.0 | All | Latest stable version with compiler support |
-| **TypeScript** | TypeScript | 5.9.3 | All | Strict mode, latest features, no any types |
-| **CSS Framework** | Tailwind CSS | 4.1.16 | All | Modern utility-first framework with v4 improvements |
-| **Scraper Technology** | Bun + Puppeteer fallback | 1.3.1 + 23.8.0 | Core Actor Identification | Primary GET method with reliable fallback (Puppeteer 23.8.0 latest stable as of 2025-10-29) |
-| **UUID Strategy** | UUID v7 | RFC 4122 | All | Time-ordered, sortable, better performance |
-| **Test Strategy** | Co-located tests structure | - | All | Clear separation, better organization |
+| Category                | Decision                   | Version        | Affects Epics             | Rationale                                                                                   |
+| ----------------------- | -------------------------- | -------------- | ------------------------- | ------------------------------------------------------------------------------------------- |
+| **Monorepo Management** | Turborepo                  | 2.5.9          | All                       | Optimized builds and dependency management (Latest stable as of 2025-10-29)                 |
+| **Frontend Framework**  | Astro                      | 5.12.0         | All                       | Performance optimized, SEO-friendly, islands architecture (Latest stable as of 2025-10-29)  |
+| **UI Components**       | shadcn/ui                  | 3.5.0          | All                       | Modern, accessible, matches rich dashboard design                                           |
+| **Backend Framework**   | Elysia                     | 1.4.13         | All                       | Type-safe, modern, excellent Bun integration (Latest stable as of 2025-10-29)               |
+| **Runtime**             | Bun                        | 1.3.1          | All                       | Ultra-fast performance, all-in-one tooling                                                  |
+| **Database**            | PostgreSQL                 | 18.0           | All                       | Scalable, reliable, supports complex queries (Latest stable released 2025-09-25)            |
+| **React Version**       | React                      | 19.2.0         | All                       | Latest stable version with compiler support                                                 |
+| **TypeScript**          | TypeScript                 | 5.9.3          | All                       | Strict mode, latest features, no any types                                                  |
+| **CSS Framework**       | Tailwind CSS               | 4.1.16         | All                       | Modern utility-first framework with v4 improvements                                         |
+| **Scraper Technology**  | Bun + Puppeteer fallback   | 1.3.1 + 23.8.0 | Core Actor Identification | Primary GET method with reliable fallback (Puppeteer 23.8.0 latest stable as of 2025-10-29) |
+| **UUID Strategy**       | UUID v7                    | RFC 4122       | All                       | Time-ordered, sortable, better performance                                                  |
+| **Test Strategy**       | Co-located tests structure | -              | All                       | Clear separation, better organization                                                       |
 
 ## Project Structure
 
@@ -273,36 +275,37 @@ i-know/
 
 ## Epic to Architecture Mapping
 
-| Epic | Lives In | Key Components | Integration Points |
-|------|-----------|----------------|-------------------|
-| **Epic 1: Foundation & Infrastructure** | `apps/api`, `apps/scraper`, packages | Database setup, authentication, CI/CD, monorepo structure | All epics depend on foundation |
-| **Epic 2: Core Actor Identification** | `apps/scraper`, `apps/api`, `apps/web` | IMDB service, actor API, search UI, data processing | Core functionality for all features |
-| **Epic 3: User Experience & Personalization** | `apps/web`, `apps/api` | User profiles, preferences, watchlist, viewing history | Depends on actor identification |
-| **Epic 4: Premium Features & Monetization** | `apps/api`, `apps/web` | Subscriptions, analytics, social features, premium content | Builds on personalization |
-| **Epic 5: Scale & Intelligence** | `apps/scraper`, `apps/api` | ML infrastructure, B2B API, advanced analytics, performance optimization | Advanced features on top of all |
+| Epic                                          | Lives In                               | Key Components                                                           | Integration Points                  |
+| --------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------- |
+| **Epic 1: Foundation & Infrastructure**       | `apps/api`, `apps/scraper`, packages   | Database setup, authentication, CI/CD, monorepo structure                | All epics depend on foundation      |
+| **Epic 2: Core Actor Identification**         | `apps/scraper`, `apps/api`, `apps/web` | IMDB service, actor API, search UI, data processing                      | Core functionality for all features |
+| **Epic 3: User Experience & Personalization** | `apps/web`, `apps/api`                 | User profiles, preferences, watchlist, viewing history                   | Depends on actor identification     |
+| **Epic 4: Premium Features & Monetization**   | `apps/api`, `apps/web`                 | Subscriptions, analytics, social features, premium content               | Builds on personalization           |
+| **Epic 5: Scale & Intelligence**              | `apps/scraper`, `apps/api`             | ML infrastructure, B2B API, advanced analytics, performance optimization | Advanced features on top of all     |
 
 ### Architecture Decision to Epic Mapping
 
-| Architecture Decision | Primary Epics Affected | Secondary Epics | Implementation Priority |
-|----------------------|-----------------------|----------------|------------------------|
-| **Turborepo 2.5.9** | Epic 1 | All | Critical - Foundation |
-| **Bun 1.3.1 Runtime** | Epic 1, Epic 2 | Epic 5 | Critical - Performance |
-| **PostgreSQL 18.0** | Epic 1 | All | Critical - Data Layer |
-| **Elysia 1.4.13** | Epic 1, Epic 2 | Epic 3, Epic 4 | Critical - API Foundation |
-| **Astro 5.12.0** | Epic 3, Epic 4 | Epic 5 | High - UI Foundation |
-| **Puppeteer 23.8.0** | Epic 2 | Epic 5 | High - Data Acquisition |
-| **Database-First Architecture** | Epic 1, Epic 2 | All | Critical - Communication Pattern |
-| **UUID v7 Strategy** | Epic 1 | All | Medium - Performance Optimization |
-| **React 19.2.0** | Epic 3, Epic 4 | Epic 5 | Medium - UI Performance |
-| **shadcn/ui 3.5.0** | Epic 3, Epic 4 | - | Medium - UI Consistency |
-| **Tailwind CSS 4.1.16** | Epic 3, Epic 4 | - | Low - Styling |
-| **Co-located Tests** | Epic 1 | All | Low - Quality Assurance |
+| Architecture Decision           | Primary Epics Affected | Secondary Epics | Implementation Priority           |
+| ------------------------------- | ---------------------- | --------------- | --------------------------------- |
+| **Turborepo 2.5.9**             | Epic 1                 | All             | Critical - Foundation             |
+| **Bun 1.3.1 Runtime**           | Epic 1, Epic 2         | Epic 5          | Critical - Performance            |
+| **PostgreSQL 18.0**             | Epic 1                 | All             | Critical - Data Layer             |
+| **Elysia 1.4.13**               | Epic 1, Epic 2         | Epic 3, Epic 4  | Critical - API Foundation         |
+| **Astro 5.12.0**                | Epic 3, Epic 4         | Epic 5          | High - UI Foundation              |
+| **Puppeteer 23.8.0**            | Epic 2                 | Epic 5          | High - Data Acquisition           |
+| **Database-First Architecture** | Epic 1, Epic 2         | All             | Critical - Communication Pattern  |
+| **UUID v7 Strategy**            | Epic 1                 | All             | Medium - Performance Optimization |
+| **React 19.2.0**                | Epic 3, Epic 4         | Epic 5          | Medium - UI Performance           |
+| **shadcn/ui 3.5.0**             | Epic 3, Epic 4         | -               | Medium - UI Consistency           |
+| **Tailwind CSS 4.1.16**         | Epic 3, Epic 4         | -               | Low - Styling                     |
+| **Co-located Tests**            | Epic 1                 | All             | Low - Quality Assurance           |
 
 ## Technology Stack Details
 
 ### Core Technologies
 
 **Frontend Stack:**
+
 - **Astro 5.12.0**: Islands architecture, SSR/SSG flexibility, optimized for mobile-first
 - **React 19.2.0**: Latest stable version with React Compiler 1.0 support
 - **TypeScript 5.9.3**: Strict mode, no `any` types, full type safety with latest features
@@ -310,17 +313,20 @@ i-know/
 - **shadcn/ui 3.5.0**: Modern component library built on Radix UI primitives
 
 **Backend Stack:**
+
 - **Bun 1.3.1**: Ultra-fast JavaScript runtime with zero-config frontend development and built-in Redis client
 - **Elysia 1.4.13**: Type-safe web framework with excellent TypeScript support
 - **PostgreSQL 18.0**: Latest stable version with advanced indexing and performance improvements
 - **Prisma 5.22.0**: Type-safe ORM with migrations and schema management
 
 **Scraper Stack:**
+
 - **Bun 1.3.1**: High-performance runtime with unified SQL API for intensive scraping operations
 - **Puppeteer 23.8.0**: Latest stable version with Chrome browser support and improved accessibility (verified 2025-10-29)
 - **Custom IMDB API**: Revolutionary direct access method (100x faster than scraping)
 
 **Development Stack:**
+
 - **Turborepo 2.5.9**: Monorepo management with intelligent caching and query capabilities
 - **PNPM 9.14.4**: Fast, disk-space efficient package management
 - **ESLint + Prettier**: Code quality and formatting standards
@@ -330,11 +336,13 @@ i-know/
 #### React 19.2.0 Breaking Changes Considerations
 
 **New Features Enabled:**
+
 - **React Compiler**: Automatic optimization memoization (available in 19.2.0+)
 - **Server Components**: Improved server-side rendering capabilities
 - **Concurrent Features**: Enhanced concurrent rendering patterns
 
 **Breaking Changes Impact:**
+
 ```typescript
 // Before React 19 - Manual memoization
 const ExpensiveComponent = React.memo(({ data }) => {
@@ -348,6 +356,7 @@ const ExpensiveComponent = ({ data }) => {
 ```
 
 **Migration Actions Required:**
+
 - Remove manual `React.memo` where React Compiler applies
 - Review useEffect dependencies for concurrent rendering
 - Update testing patterns for concurrent features
@@ -355,11 +364,13 @@ const ExpensiveComponent = ({ data }) => {
 #### PostgreSQL 18.0 Breaking Changes Considerations
 
 **New Features Enabled:**
+
 - **Improved Performance**: Enhanced query optimizer and indexing
 - **Better JSON Support**: Improved JSONB operations and indexing
 - **Security Enhancements**: Enhanced authentication and encryption
 
 **Breaking Changes Impact:**
+
 ```sql
 -- New performance features (no breaking changes)
 CREATE INDEX CONCURRENTLY idx_actors_enhanced_search
@@ -372,6 +383,7 @@ FROM actors;
 ```
 
 **Migration Actions Required:**
+
 - Database migration planning for performance indexes
 - Review of existing JSON queries for optimization opportunities
 - Update connection pool configuration for new performance features
@@ -379,17 +391,20 @@ FROM actors;
 #### Tailwind CSS 4.1.16 Breaking Changes Considerations
 
 **New Features Enabled:**
+
 - **Enhanced Performance**: Improved CSS generation and caching
 - **New Utility Classes**: Additional layout and spacing utilities
 - **Better TypeScript Support**: Enhanced type safety for utility classes
 
 **Breaking Changes Impact:**
+
 ```css
 /* Tailwind v4 improvements - generally backward compatible */
 /* No major breaking changes expected in utility usage */
 ```
 
 **Migration Actions Required:**
+
 - Update configuration file format if using advanced features
 - Review build scripts for new optimization opportunities
 - Test responsive behavior with new utilities
@@ -397,21 +412,23 @@ FROM actors;
 #### Elysia 1.4.13 Breaking Changes Considerations
 
 **New Features Enabled:**
+
 - **Enhanced Type Safety**: Improved TypeScript inference
 - **Better Error Handling**: Structured error responses
 - **Performance Optimizations**: Request handling improvements
 
 **Breaking Changes Impact:**
+
 ```typescript
 // Enhanced type safety improvements (no breaking changes)
-const app = new Elysia()
-  .get('/actors/:id', ({ params: { id } }) => {
-    // Enhanced type inference for route parameters
-    return getActor(id);
-  });
+const app = new Elysia().get('/actors/:id', ({ params: { id } }) => {
+  // Enhanced type inference for route parameters
+  return getActor(id);
+});
 ```
 
 **Migration Actions Required:**
+
 - Review middleware for enhanced type safety opportunities
 - Update error handling patterns for new structured responses
 - Test performance with new optimization features
@@ -427,6 +444,7 @@ const app = new Elysia()
 ✅ **Bun 1.3.1**: Stable runtime with incremental improvements
 
 **Migration Strategy**:
+
 1. **Incremental Updates**: Update dependencies individually and test
 2. **Feature Flags**: Use feature flags for React 19 optimizations
 3. **Database Backups**: Comprehensive backup strategy before PostgreSQL upgrade
@@ -435,12 +453,14 @@ const app = new Elysia()
 ### Integration Points
 
 **Service Communication:**
+
 - **Database-First Architecture**: All services communicate through PostgreSQL
 - **Shared Types**: Common TypeScript types in `packages/types/`
 - **API Contracts**: OpenAPI specifications for all endpoints
 - **Event-Driven Updates**: Database triggers for real-time cache invalidation
 
 **Build Pipeline:**
+
 - **Parallel Builds**: Turbo orchestrates independent app builds
 - **Shared Dependencies**: hoisted to root for optimization
 - **Cross-App Testing**: Integration tests verify service interactions
@@ -451,6 +471,7 @@ const app = new Elysia()
 These patterns ensure consistent implementation across all AI agents:
 
 ### Naming Patterns
+
 - **Database Tables**: snake_case plural (`actors`, `users`, `viewing_history`)
 - **API Routes**: kebab-case with versioning (`/api/v1/actor-profiles`, `/api/v1/search-actors`)
 - **Components**: PascalCase with descriptive names (`ActorCard`, `ContentBanner`, `DiscoveryGrid`)
@@ -459,6 +480,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Constants**: UPPER_SNAKE_CASE (`API_BASE_URL`, `MAX_RESULTS_PER_PAGE`)
 
 ### Structure Patterns
+
 - **Frontend Architecture**: Feature-based organization under `src/components/features/`
 - **Backend Routes**: RESTful grouping by resource under `src/routes/`
 - **Shared Components**: Reusable UI elements in `packages/ui/`
@@ -466,6 +488,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Type Definitions**: Centralized in `packages/types/` for cross-app consistency
 
 ### Format Patterns
+
 - **API Response Envelope**: `{data: T, error?: string, meta?: {pagination: object}}`
 - **Error Response Format**: `{code: string, message: string, details?: object, timestamp: string}`
 - **Date Handling**: ISO 8601 strings in APIs, localized formatting in UI
@@ -473,6 +496,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Search Response**: Ranked results with relevance scores and pagination metadata
 
 ### Communication Patterns
+
 - **REST API Standards**: HTTP verbs with proper status codes and semantic meaning
 - **Error Propagation**: Structured error handling with correlation IDs
 - **Data Validation**: Input validation at API boundaries with detailed error messages
@@ -480,6 +504,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Caching Strategy**: Multi-layer caching (browser, CDN, application, database)
 
 ### Lifecycle Patterns
+
 - **Loading States**: Skeleton components with progressive content loading
 - **Error Recovery**: Exponential backoff with user-friendly retry mechanisms
 - **Data Synchronization**: Optimistic updates with rollback capabilities
@@ -487,6 +512,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Session Management**: Secure token handling with refresh strategies
 
 ### Location Patterns
+
 - **API Versioning**: `/api/v1/` prefix for backward compatibility
 - **Static Assets**: Optimized delivery through CDN with cache headers
 - **Database Schema**: Logical organization with clear relationship boundaries
@@ -494,6 +520,7 @@ These patterns ensure consistent implementation across all AI agents:
 - **Log Storage**: Structured logging with rotation and archival policies
 
 ### Consistency Patterns
+
 - **Date Formatting**: ISO storage, localized presentation with timezone handling
 - **Logging Standards**: Structured JSON logs with request correlation IDs
 - **Error Messaging**: User-friendly, actionable error messages with localization
@@ -505,6 +532,7 @@ These patterns ensure consistent implementation across all AI agents:
 ### Naming Conventions
 
 **Database Schema:**
+
 ```sql
 -- Tables: snake_case plural
 CREATE TABLE actors (
@@ -523,15 +551,17 @@ CREATE TABLE viewing_history (
 ```
 
 **API Routes:**
+
 ```typescript
 // File: src/routes/actors/[id].ts
 export const actorRoutes = new Elysia({ prefix: '/actors' })
-  .get('/:id', getActorHandler)           // GET /api/v1/actors/:id
-  .get('/', searchActorsHandler)         // GET /api/v1/actors?search=...
-  .post('/', createActorHandler)         // POST /api/v1/actors
+  .get('/:id', getActorHandler) // GET /api/v1/actors/:id
+  .get('/', searchActorsHandler) // GET /api/v1/actors?search=...
+  .post('/', createActorHandler); // POST /api/v1/actors
 ```
 
 **Component Files:**
+
 ```typescript
 // File: src/components/features/actor-search/actor-search-result.tsx
 interface ActorSearchResultProps {
@@ -539,10 +569,7 @@ interface ActorSearchResultProps {
   onActorSelect: (actorId: string) => void;
 }
 
-export const ActorSearchResult: React.FC<ActorSearchResultProps> = ({
-  actor,
-  onActorSelect
-}) => {
+export const ActorSearchResult: React.FC<ActorSearchResultProps> = ({ actor, onActorSelect }) => {
   // Component implementation
 };
 ```
@@ -550,12 +577,14 @@ export const ActorSearchResult: React.FC<ActorSearchResultProps> = ({
 ### Code Organization
 
 **Import Order:**
+
 1. External libraries (React, Elysia, etc.)
 2. Internal packages (@iknow/ui, @iknow/types)
 3. Relative imports (./components, ../services)
 4. Type-only imports last
 
 **File Structure:**
+
 ```typescript
 // actor-service.ts
 import { DatabaseService } from '../services/database-service';
@@ -571,28 +600,25 @@ export class ActorService {
 ### Error Handling
 
 **API Error Response:**
+
 ```typescript
 export class ApiError extends Error {
   constructor(
     public code: string,
     message: string,
     public details?: object,
-    public statusCode: number = 500
+    public statusCode: number = 500,
   ) {
     super(message);
   }
 }
 
 // Usage
-throw new ApiError(
-  'ACTOR_NOT_FOUND',
-  'Actor not found',
-  { actorId: id },
-  404
-);
+throw new ApiError('ACTOR_NOT_FOUND', 'Actor not found', { actorId: id }, 404);
 ```
 
 **Frontend Error Boundaries:**
+
 ```typescript
 export const ErrorBoundary: React.FC<{
   children: React.ReactNode;
@@ -605,6 +631,7 @@ export const ErrorBoundary: React.FC<{
 ### Logging Strategy
 
 **Structured Logging:**
+
 ```typescript
 import { logger } from '../utils/logger';
 
@@ -620,7 +647,7 @@ export class ActorService {
       logger.error('Failed to fetch actor', {
         actorId: id,
         error: error.message,
-        stack: error.stack
+        stack: error.stack,
       });
       throw error;
     }
@@ -639,6 +666,7 @@ export class ActorService {
 **Core Principle**: All services communicate through a shared PostgreSQL database rather than direct API calls or message queues. This creates a simple, reliable, and scalable communication pattern.
 
 **Component Interactions:**
+
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │   Scraper   │    │     API     │    │   Frontend  │
@@ -662,6 +690,7 @@ export class ActorService {
 4. **Schema Contracts**: Database schema serves as the integration contract
 
 **Data Flow for Actor Identification:**
+
 ```typescript
 // Scraper Service writes actor data
 interface ActorScraperService {
@@ -688,6 +717,7 @@ interface ActorClient {
 ```
 
 **Benefits:**
+
 - **Simplicity**: No message broker infrastructure needed
 - **Reliability**: Database transactions guarantee data consistency
 - **Scalability**: Read replicas and connection pooling handle scale
@@ -695,6 +725,7 @@ interface ActorClient {
 - **Testing**: Easier to test with single data source
 
 **Trade-offs:**
+
 - **Latency**: Higher latency than direct service calls (acceptable for our use case)
 - **Database Load**: Increased read/write load on database (mitigated with caching)
 - **Real-time Limits**: Not suitable for sub-millisecond real-time requirements
@@ -712,6 +743,7 @@ interface ActorClient {
 3. **Tertiary Tier - Cached Results**: Database caching with TTL-based invalidation
 
 **Implementation Architecture:**
+
 ```typescript
 interface IMDBService {
   // Tier 1: Direct API access (100x faster than scraping)
@@ -753,6 +785,7 @@ class SmartIMDBService implements IMDBService {
 ```
 
 **Rate Limiting Strategy:**
+
 ```typescript
 class RateLimitedScraper {
   private queue = new Queue({ concurrency: 1 });
@@ -776,6 +809,7 @@ class RateLimitedScraper {
 ```
 
 **Success Metrics:**
+
 - **API Success Rate**: ~85% (direct access for structured data)
 - **Scraping Success Rate**: ~95% (when API fails)
 - **Cache Hit Rate**: ~60% (for frequently requested actors)
@@ -788,6 +822,7 @@ class RateLimitedScraper {
 **Context**: Distributed system with multiple services creating entities that need to be sortable by creation time without additional columns
 
 **Implementation:**
+
 ```typescript
 // UUID v7 implementation
 function generateUUIDv7(): string {
@@ -814,6 +849,7 @@ SELECT * FROM actors ORDER BY id; // Automatically chronological
 ```
 
 **Benefits:**
+
 - **Chronological Sorting**: IDs naturally sort by creation time
 - **Distributed Generation**: No central coordination needed
 - **Performance**: Better database indexing than random UUIDs
@@ -824,6 +860,7 @@ SELECT * FROM actors ORDER BY id; // Automatically chronological
 ### Core Entities
 
 **Actor Entity:**
+
 ```typescript
 interface Actor {
   id: string; // UUID v7
@@ -840,6 +877,7 @@ interface Actor {
 ```
 
 **User Entity:**
+
 ```typescript
 interface User {
   id: string; // UUID v7
@@ -854,6 +892,7 @@ interface User {
 ```
 
 **Content Entity:**
+
 ```typescript
 interface Content {
   id: string; // UUID v7
@@ -948,6 +987,7 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id, added_at DESC);
 ### Actor API
 
 **GET /api/v1/actors/:id**
+
 ```typescript
 // Request
 // No body required
@@ -991,6 +1031,7 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id, added_at DESC);
 ```
 
 **GET /api/v1/actors/search**
+
 ```typescript
 // Request Query Parameters
 {
@@ -1027,6 +1068,7 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id, added_at DESC);
 ### User API
 
 **POST /api/v1/users**
+
 ```typescript
 // Request Body
 {
@@ -1051,6 +1093,7 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id, added_at DESC);
 ```
 
 **GET /api/v1/users/:id/viewing-history**
+
 ```typescript
 // Response (200 OK)
 {
@@ -1090,18 +1133,21 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id, added_at DESC);
 ### Authentication & Authorization
 
 **Password Security:**
+
 - Argon2id hashing with memory-hard parameters
 - Minimum 12 character password length
 - Password strength validation during registration
 - Rate limiting on authentication endpoints
 
 **Session Management:**
+
 - JWT tokens with short expiration (15 minutes)
 - Secure, HTTP-only refresh tokens (7 days)
 - Token rotation on each refresh
 - Device-based session tracking
 
 **API Security:**
+
 ```typescript
 // Middleware example
 const authMiddleware = (app: Elysia) =>
@@ -1126,12 +1172,14 @@ const authMiddleware = (app: Elysia) =>
 ### Data Protection
 
 **Input Validation:**
+
 - Type-safe validation with Zod schemas
 - SQL injection prevention through parameterized queries
 - XSS protection with content security headers
 - File upload validation with virus scanning
 
 **Privacy Controls:**
+
 - GDPR-compliant data handling
 - User consent management
 - Data export and deletion capabilities
@@ -1142,6 +1190,7 @@ const authMiddleware = (app: Elysia) =>
 ### Database Optimization
 
 **Indexing Strategy:**
+
 ```sql
 -- Search optimization
 CREATE INDEX CONCURRENTLY idx_actors_search_vector
@@ -1157,6 +1206,7 @@ ON filmography(actor_id, content_id, is_main_role);
 ```
 
 **Query Optimization:**
+
 - Connection pooling with pgpool-II
 - Read replicas for scaling read operations
 - Query result caching with Redis
@@ -1165,53 +1215,53 @@ ON filmography(actor_id, content_id, is_main_role);
 ### Frontend Performance
 
 **Bundle Optimization:**
+
 - Astro island architecture for selective hydration
 - Code splitting by route and feature
 - Tree shaking for unused dependencies
 - Modern asset optimization with Image CDN
 
 **Caching Strategy:**
+
 ```typescript
 // Service worker for offline support
 const cacheStrategy = {
   actorProfiles: {
     strategy: 'CacheFirst',
     maxAge: 24 * 60 * 60, // 24 hours
-    maxEntries: 1000
+    maxEntries: 1000,
   },
   searchResults: {
     strategy: 'NetworkFirst',
     maxAge: 5 * 60, // 5 minutes
-    maxEntries: 100
-  }
+    maxEntries: 100,
+  },
 };
 ```
 
 ### Monitoring & Observability
 
 **Performance Metrics:**
+
 - Core Web Vitals monitoring
 - API response time tracking
 - Database query performance
 - Error rate and type tracking
 
 **Health Checks:**
+
 ```typescript
 // Health check endpoint
 app.get('/health', async () => {
-  const checks = await Promise.allSettled([
-    checkDatabase(),
-    checkRedis(),
-    checkExternalAPIs()
-  ]);
+  const checks = await Promise.allSettled([checkDatabase(), checkRedis(), checkExternalAPIs()]);
 
   return {
     status: checks.every(c => c.status === 'fulfilled') ? 'healthy' : 'degraded',
     checks: checks.map(c => ({
       status: c.status,
-      ...(c.status === 'rejected' && { error: c.reason.message })
+      ...(c.status === 'rejected' && { error: c.reason.message }),
     })),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 });
 ```
@@ -1221,6 +1271,7 @@ app.get('/health', async () => {
 ### Container Strategy
 
 **Docker Configuration:**
+
 ```dockerfile
 # Backend (Elysia)
 FROM oven/bun:1-alpine AS base
@@ -1245,6 +1296,7 @@ COPY --from=base /app/dist /usr/share/nginx/html
 ### Infrastructure
 
 **Production Stack:**
+
 - **Application Hosting**: Railway/Render for simplicity, scale to AWS/GCP
 - **Database**: PostgreSQL with read replicas
 - **CDN**: CloudFlare for static assets and DDoS protection
@@ -1252,6 +1304,7 @@ COPY --from=base /app/dist /usr/share/nginx/html
 - **Logging**: Structured logs with ELK stack
 
 **Environment Configuration:**
+
 ```bash
 # Production environment variables
 DATABASE_URL="postgresql://user:pass@host:5432/iknow_prod"
@@ -1265,6 +1318,7 @@ RATE_LIMIT_WINDOW="900000" # 15 minutes
 ### CI/CD Pipeline
 
 **GitHub Actions:**
+
 ```yaml
 name: Deploy
 on:
@@ -1295,6 +1349,7 @@ jobs:
 ### Prerequisites
 
 **Required Tools:**
+
 - **Bun 1.1.38+**: JavaScript runtime and package manager
 - **Node.js 20+**: Required for some Astro dependencies
 - **PostgreSQL 16+**: Local database development
@@ -1302,6 +1357,7 @@ jobs:
 - **VS Code**: Recommended IDE with extensions
 
 **VS Code Extensions:**
+
 ```json
 {
   "recommendations": [
@@ -1353,6 +1409,7 @@ bun run build:api    # Backend only
 ### Development Workflow
 
 **Making Changes:**
+
 1. Create feature branch from `develop`
 2. Implement changes with TypeScript strict mode
 3. Add tests for new functionality
@@ -1360,6 +1417,7 @@ bun run build:api    # Backend only
 5. Submit pull request with detailed description
 
 **Code Quality:**
+
 ```bash
 # Lint and format
 bun run lint         # Check for issues
@@ -1378,30 +1436,35 @@ bun run db:reset     # Reset database
 ## Architecture Decision Records (ADRs)
 
 ### ADR-001: Monorepo with Turborepo
+
 **Status**: Accepted
 **Context**: Multiple applications (web, api, scraper) with shared dependencies
 **Decision**: Use Turborepo for monorepo management
 **Consequences**: Simplified dependency management, consistent builds, shared tooling
 
 ### ADR-002: Bun + Elysia Stack
+
 **Status**: Accepted
 **Context**: Modern stack with performance requirements for 1M+ users
 **Decision**: Use Bun runtime with Elysia framework
 **Consequences**: Ultra-fast performance, TypeScript-first development, simplified deployment
 
 ### ADR-003: Database-First Service Communication
+
 **Status**: Accepted
 **Context**: Multiple services need to share data efficiently
 **Decision**: Use PostgreSQL as central communication hub
 **Consequences**: Simplified architecture, reliable data consistency, easy scaling
 
 ### ADR-004: UUID v7 for Primary Keys
+
 **Status**: Accepted
 **Context**: Need sortable, performant unique identifiers
 **Decision**: Use UUID v7 (time-ordered) for all entities
 **Consequences**: Better performance, chronological sorting, distributed generation
 
 ### ADR-005: Strict TypeScript with No Any Types
+
 **Status**: Accepted
 **Context**: Type safety critical for complex actor relationships
 **Decision**: Enforce strict TypeScript mode, prohibit `any` types
