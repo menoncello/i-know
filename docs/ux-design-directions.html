@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Know - Design Directions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        secondary: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: '-10px' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .mobile-frame {
+            width: 375px;
+            height: 812px;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+        .design-direction {
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        .design-direction:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        .design-direction.active {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+        .actor-card {
+            transition: all 0.2s ease;
+        }
+        .actor-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div class="min-h-screen p-4 md:p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                🎬 I Know Design Directions
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
+                Interactive design mockups exploring different visual approaches for your entertainment intelligence platform.
+                Each direction shows how users experience the magic of instant actor discovery.
+            </p>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex justify-center items-center space-x-4 mb-8">
+            <button onclick="toggleDarkMode()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition">
+                <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+            </button>
+            <button onclick="showComparison()" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                👀 Compare All
+            </button>
+        </div>
+
+        <!-- Design Directions Grid -->
+        <div id="directionsGrid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+
+            <!-- Direction 1: Minimal Discovery -->
+            <div class="design-direction bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-direction="minimal">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold gradient-text">Minimal Discovery</h2>
+                        <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm">Clean</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Focus on the "aha!" moment with maximum breathing room. Perfect for users who want instant answers without cognitive overload.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Spacious</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Content-first</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Elegant</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="flex justify-center p-6 bg-gray-50 dark:bg-gray-900">
+                    <div class="mobile-frame bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-6 py-2 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="h-full bg-white dark:bg-gray-900 p-4">
+                            <!-- Header -->
+                            <div class="text-center mb-6">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">I Know</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Currently Watching</p>
+                            </div>
+
+                            <!-- Current Content -->
+                            <div class="mb-8 text-center">
+                                <div class="w-32 h-48 mx-auto bg-gradient-to-br from-primary-400 to-secondary-400 rounded-xl mb-4 flex items-center justify-center">
+                                    <span class="text-white text-4xl">🎬</span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Stranger Things</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Season 4, Episode 1</p>
+                            </div>
+
+                            <!-- Actor Grid -->
+                            <div class="mb-6">
+                                <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Tap to Discover</h5>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="actor-card text-center cursor-pointer">
+                                        <div class="w-16 h-16 mx-auto bg-gray-200 dark:bg-gray-700 rounded-full mb-2 flex items-center justify-center">
+                                            <span class="text-2xl">👨</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Actor 1</p>
+                                    </div>
+                                    <div class="actor-card text-center cursor-pointer">
+                                        <div class="w-16 h-16 mx-auto bg-gray-200 dark:bg-gray-700 rounded-full mb-2 flex items-center justify-center">
+                                            <span class="text-2xl">👩</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Actor 2</p>
+                                    </div>
+                                    <div class="actor-card text-center cursor-pointer">
+                                        <div class="w-16 h-16 mx-auto bg-gray-200 dark:bg-gray-700 rounded-full mb-2 flex items-center justify-center">
+                                            <span class="text-2xl">👦</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Actor 3</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Magic Discovery Result -->
+                            <div class="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-4 border border-primary-200 dark:border-primary-800">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <div class="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold">MF</div>
+                                    <div>
+                                        <h6 class="font-semibold text-gray-900 dark:text-white">Millie Bobby Brown</h6>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">as Eleven</p>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300">
+                                    <p class="mb-1">🎭 Also in: <span class="font-medium">Enola Holmes</span></p>
+                                    <p>🏆 <span class="text-primary-600 dark:text-primary-400">15+ other productions</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Direction 2: Rich Dashboard -->
+            <div class="design-direction bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-direction="dashboard">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold gradient-text">Rich Dashboard</h2>
+                        <span class="px-3 py-1 bg-secondary-100 dark:bg-secondary-900 text-secondary-800 dark:text-secondary-200 rounded-full text-sm">Powerful</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Information-rich interface for entertainment enthusiasts who want comprehensive insights and deep discovery capabilities.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Data-dense</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Analytics</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Expert</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="flex justify-center p-6 bg-gray-50 dark:bg-gray-900">
+                    <div class="mobile-frame bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-6 py-2 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="h-full bg-white dark:bg-gray-900 p-4 overflow-y-auto">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">I Know</h3>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                        <span>🔍</span>
+                                    </button>
+                                    <button class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                        <span>👤</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-2 text-center">
+                                    <p class="text-lg font-bold text-primary-600 dark:text-primary-400">247</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Actors</p>
+                                </div>
+                                <div class="bg-secondary-50 dark:bg-secondary-900/20 rounded-lg p-2 text-center">
+                                    <p class="text-lg font-bold text-secondary-600 dark:text-secondary-400">43</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Shows</p>
+                                </div>
+                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 text-center">
+                                    <p class="text-lg font-bold text-amber-600 dark:text-amber-400">12h</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Watched</p>
+                                </div>
+                            </div>
+
+                            <!-- Currently Watching -->
+                            <div class="mb-4">
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Currently Watching</h4>
+                                <div class="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl p-3 text-white">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-12 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                                            <span class="text-2xl">🎬</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h5 class="font-semibold">Stranger Things</h5>
+                                            <p class="text-xs opacity-90">S4:E1 • 82% complete</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actor Connections -->
+                            <div class="mb-4">
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Actor Connections</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-bold">MF</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Millie Bobby Brown</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">15 productions • 8 genres</p>
+                                        </div>
+                                        <button class="text-primary-600 dark:text-primary-400">
+                                            <span>→</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 bg-secondary-600 rounded-full flex items-center justify-center text-white text-sm font-bold">DH</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">David Harbour</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">32 productions • 12 genres</p>
+                                        </div>
+                                        <button class="text-secondary-600 dark:text-secondary-400">
+                                            <span>→</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Discoveries -->
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Recent Discoveries</h4>
+                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
+                                    <p class="text-xs text-amber-800 dark:text-amber-200 font-medium mb-1">🎉 New Connection Found!</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">The actor who plays Hopper also appears in...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Direction 3: Card Gallery -->
+            <div class="design-direction bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-direction="cards">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold gradient-text">Card Gallery</h2>
+                        <span class="px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 rounded-full text-sm">Visual</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Visually rich card-based interface that showcases actors and content beautifully. Perfect for users who love visual browsing.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Image-focused</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Browse-friendly</span>
+                        <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Engaging</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="flex justify-center p-6 bg-gray-50 dark:bg-gray-900">
+                    <div class="mobile-frame bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-6 py-2 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="h-full bg-white dark:bg-gray-900 p-4">
+                            <!-- Header -->
+                            <div class="text-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">I Know</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Discover • Connect • Explore</p>
+                            </div>
+
+                            <!-- Search Bar -->
+                            <div class="relative mb-4">
+                                <input type="text" placeholder="Search actors, shows, movies..."
+                                    class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-sm pl-10">
+                                <span class="absolute left-3 top-3.5 text-gray-400">🔍</span>
+                            </div>
+
+                            <!-- Featured Content -->
+                            <div class="mb-4">
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Now Discovering</h4>
+                                <div class="bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl p-4 text-white">
+                                    <div class="flex items-center space-x-3 mb-3">
+                                        <div class="w-16 h-20 bg-white/20 rounded-lg flex items-center justify-center">
+                                            <span class="text-3xl">🎬</span>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold">Stranger Things</h5>
+                                            <p class="text-xs opacity-90">Tap actors to explore</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">👨</div>
+                                        <div class="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">👩</div>
+                                        <div class="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">👦</div>
+                                        <div class="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">+12</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actor Cards -->
+                            <div class="mb-4">
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Cast Members</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="actor-card cursor-pointer">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
+                                            <div class="h-24 bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                                                <span class="text-3xl">👩</span>
+                                            </div>
+                                            <div class="p-3">
+                                                <h6 class="text-sm font-semibold text-gray-900 dark:text-white">Millie Bobby</h6>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Eleven</p>
+                                                <div class="mt-2 flex items-center text-xs text-primary-600 dark:text-primary-400">
+                                                    <span>15 shows</span>
+                                                    <span class="ml-1">→</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="actor-card cursor-pointer">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
+                                            <div class="h-24 bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center">
+                                                <span class="text-3xl">👨</span>
+                                            </div>
+                                            <div class="p-3">
+                                                <h6 class="text-sm font-semibold text-gray-900 dark:text-white">David Harbour</h6>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Hopper</p>
+                                                <div class="mt-2 flex items-center text-xs text-secondary-600 dark:text-secondary-400">
+                                                    <span>32 shows</span>
+                                                    <span class="ml-1">→</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="bg-primary-100 dark:bg-primary-900/20 rounded-lg p-2 text-center">
+                                    <span class="text-lg">⭐</span>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Watchlist</p>
+                                </button>
+                                <button class="bg-secondary-100 dark:bg-secondary-900/20 rounded-lg p-2 text-center">
+                                    <span class="text-lg">🎭</span>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Genres</p>
+                                </button>
+                                <button class="bg-amber-100 dark:bg-amber-900/20 rounded-lg p-2 text-center">
+                                    <span class="text-lg">🔥</span>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Trending</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Selection Interface -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Which Design Direction Resonates?</h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <button onclick="selectDirection('minimal')" class="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-primary-500 transition text-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full mx-auto mb-2"></div>
+                    <span class="text-sm font-medium">Minimal</span>
+                </button>
+                <button onclick="selectDirection('dashboard')" class="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-secondary-500 transition text-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-secondary-400 to-amber-400 rounded-full mx-auto mb-2"></div>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </button>
+                <button onclick="selectDirection('cards')" class="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-amber-500 transition text-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-red-400 rounded-full mx-auto mb-2"></div>
+                    <span class="text-sm font-medium">Cards</span>
+                </button>
+            </div>
+
+            <div class="text-center text-gray-600 dark:text-gray-300">
+                <p class="mb-2">💡 <strong>Pro tip:</strong> Consider which direction best creates those "delighted and surprised" moments!</p>
+                <p class="text-sm">You can combine elements from different directions or request variations.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedDirection = null;
+        let isDarkMode = false;
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark');
+
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+
+            if (isDarkMode) {
+                icon.textContent = '☀️';
+                text.textContent = 'Light Mode';
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Dark Mode';
+            }
+        }
+
+        function showComparison() {
+            const grid = document.getElementById('directionsGrid');
+            const currentClass = grid.className;
+
+            if (currentClass.includes('lg:grid-cols-2')) {
+                grid.className = currentClass.replace('lg:grid-cols-2', 'lg:grid-cols-3');
+            } else {
+                grid.className = currentClass.replace('lg:grid-cols-3', 'lg:grid-cols-2');
+            }
+        }
+
+        function selectDirection(directionName) {
+            selectedDirection = directionName;
+
+            // Remove active class from all previews
+            document.querySelectorAll('.design-direction').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active class to selected direction
+            document.querySelector(`[data-direction="${directionName}"]`).classList.add('active');
+
+            // Scroll to selected direction
+            document.querySelector(`[data-direction="${directionName}"]`).scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            const descriptions = {
+                minimal: 'Minimal Discovery - Clean, content-first design focusing on the "aha!" moment',
+                dashboard: 'Rich Dashboard - Information-rich interface for entertainment enthusiasts',
+                cards: 'Card Gallery - Visually rich card-based browsing experience'
+            };
+
+            // Show selection confirmation
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-primary-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            notification.textContent = `✨ Selected: ${descriptions[directionName]}`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Add click handlers to design directions
+        document.querySelectorAll('.design-direction').forEach(direction => {
+            direction.addEventListener('click', function() {
+                const directionName = this.dataset.direction;
+                selectDirection(directionName);
+            });
+        });
+
+        // Check for system dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleDarkMode();
+        }
+    </script>
+</body>
+</html>

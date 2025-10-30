@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Know - Real-time Actor Identification Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        secondary: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: '-10px' }
+                        },
+                        shimmer: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' }
+                        },
+                        bounceGentle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .journey-step {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .journey-step:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .journey-step.active {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+        .mobile-screen {
+            width: 320px;
+            height: 640px;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .flow-line {
+            stroke: #10b981;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 5, 5;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -100;
+            }
+        }
+        .magic-sparkle {
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .success-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div class="min-h-screen p-4 md:p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                🎬 Real-time Actor Identification Journey
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
+                Experience the magical flow that transforms 5-10 minutes of manual searching into 3 seconds of delightful discovery.
+            </p>
+        </div>
+
+        <!-- Journey Controls -->
+        <div class="flex justify-center items-center space-x-4 mb-8">
+            <button onclick="toggleDarkMode()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition">
+                <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+            </button>
+            <button onclick="playJourney()" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                ▶️ Play Journey
+            </button>
+            <button onclick="resetJourney()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                🔄 Reset
+            </button>
+        </div>
+
+        <!-- User Context -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-2xl">
+                    👩‍💼
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Sarah, Entertainment Enthusiast</h2>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Streaming "Stranger Things" on Netflix • Recognizes an actor but can't place them
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Journey Steps Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+
+            <!-- Step 1: Content Detection -->
+            <div class="journey-step bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-step="1">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Content Detection</h3>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">
+                            Automatic
+                        </span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        I Know automatically detects what Sarah is watching through TV remote/metadata APIs.
+                    </p>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span>⏱️ 0.5 seconds</span>
+                        <span>•</span>
+                        <span>🔄 Background</span>
+                        <span>•</span>
+                        <span>✅ Zero effort</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="bg-gray-50 dark:bg-gray-900 p-4">
+                    <div class="mobile-screen bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-4 py-1 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="p-3 h-full flex flex-col">
+                            <!-- Detection Status -->
+                            <div class="text-center mb-4">
+                                <div class="w-12 h-12 mx-auto bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-2 animate-pulse">
+                                    <span class="text-2xl">📡</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Detecting Content</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Analyzing stream metadata...</p>
+                            </div>
+
+                            <!-- Detection Result -->
+                            <div class="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg p-3 text-white text-center">
+                                <div class="w-16 h-20 mx-auto bg-white/20 rounded-lg flex items-center justify-center mb-2">
+                                    <span class="text-2xl">🎬</span>
+                                </div>
+                                <h5 class="font-bold text-sm">Stranger Things</h5>
+                                <p class="text-xs opacity-90">Season 4, Episode 1</p>
+                                <p class="text-xs opacity-75 mt-1">Netflix • HD</p>
+                            </div>
+
+                            <!-- Cast Loading -->
+                            <div class="mt-4 text-center">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Loading cast information...</p>
+                                <div class="flex justify-center space-x-2">
+                                    <div class="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-bounce"></div>
+                                    <div class="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                    <div class="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Actor Recognition -->
+            <div class="journey-step bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-step="2">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Actor Recognition</h3>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
+                            Interactive
+                        </span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Sarah recognizes an actor on screen and opens I Know to instantly identify them.
+                    </p>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span>⏱️ 1 second</span>
+                        <span>•</span>
+                        <span>👆 Single tap</span>
+                        <span>•</span>
+                        <span>✨ Magic moment</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="bg-gray-50 dark:bg-gray-900 p-4">
+                    <div class="mobile-screen bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-4 py-1 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="p-3 h-full flex flex-col">
+                            <!-- Current Watching Header -->
+                            <div class="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg p-2 text-white mb-3">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-10 h-12 bg-white/20 rounded flex items-center justify-center">
+                                        <span class="text-lg">🎬</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h5 class="font-bold text-xs">Stranger Things</h5>
+                                        <p class="text-xs opacity-90">S4:E1 • Tap actors below</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Talvez você conheça de... Section -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                                    <span class="text-amber-500 mr-1">💡</span>
+                                    Talvez você conheça de...
+                                </h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                                <span class="text-white text-xs">👨</span>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs font-medium text-gray-900 dark:text-white">David Harbour</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Hopper</p>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex items-center space-x-1">
+                                                <div class="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                                                    <span class="text-white" style="font-size: 8px;">✓</span>
+                                                </div>
+                                                <p class="text-xs text-gray-700 dark:text-gray-300">
+                                                    <span class="font-medium">Black Widow</span>
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center space-x-1">
+                                                <div class="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                                                    <span class="text-white" style="font-size: 8px;">✓</span>
+                                                </div>
+                                                <p class="text-xs text-gray-700 dark:text-gray-300">
+                                                    <span class="font-medium">Suicide Squad</span>
+                                                </p>
+                                            </div>
+                                            <p class="text-xs text-blue-600 dark:text-blue-400">+2 filmes</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-2 border border-purple-200 dark:border-purple-800">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                                <span class="text-white text-xs">👦</span>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs font-medium text-gray-900 dark:text-white">Finn Wolfhard</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Mike</p>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex items-center space-x-1">
+                                                <div class="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                                                    <span class="text-white" style="font-size: 8px;">✓</span>
+                                                </div>
+                                                <p class="text-xs text-gray-700 dark:text-gray-300">
+                                                    <span class="font-medium">IT (2017/2019)</span>
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center space-x-1">
+                                                <div class="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                                                    <span class="text-white" style="font-size: 8px;">✓</span>
+                                                </div>
+                                                <p class="text-xs text-gray-700 dark:text-gray-300">
+                                                    <span class="font-medium">The Addams Family</span>
+                                                </p>
+                                            </div>
+                                            <p class="text-xs text-purple-600 dark:text-purple-400">+1 filme</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cast Grid with Viewing History -->
+                            <div>
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Atores na cena</h4>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="text-center cursor-pointer hover:scale-105 transition">
+                                        <div class="w-12 h-12 mx-auto bg-gray-200 dark:bg-gray-700 rounded-full mb-1 flex items-center justify-center relative">
+                                            <span class="text-lg">👨</span>
+                                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                                                <span class="text-white text-xs">!</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">David</p>
+                                        <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">Já viu!</p>
+                                    </div>
+                                    <div class="text-center cursor-pointer hover:scale-105 transition ring-2 ring-primary-500 rounded-lg">
+                                        <div class="w-12 h-12 mx-auto bg-primary-600 rounded-full mb-1 flex items-center justify-center animate-pulse">
+                                            <span class="text-lg">👩</span>
+                                        </div>
+                                        <p class="text-xs font-medium text-primary-600 dark:text-primary-400">Millie</p>
+                                        <p class="text-xs text-primary-600 dark:text-primary-400">Toque!</p>
+                                    </div>
+                                    <div class="text-center cursor-pointer hover:scale-105 transition">
+                                        <div class="w-12 h-12 mx-auto bg-gray-200 dark:bg-gray-700 rounded-full mb-1 flex items-center justify-center relative">
+                                            <span class="text-lg">👦</span>
+                                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full flex items-center justify-center">
+                                                <span class="text-white text-xs">!</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Finn</p>
+                                        <p class="text-xs text-purple-600 dark:text-purple-400 font-medium">Já viu!</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Instruction -->
+                            <div class="mt-4 text-center">
+                                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-2">
+                                    <p class="text-xs text-primary-700 dark:text-primary-300">
+                                        👆 Toque em qualquer ator para descobrir a carreira completa
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- User thinking bubble -->
+                            <div class="mt-4 text-center">
+                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 relative">
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 italic">
+                                        "Ahhh! É o David Harbour do Black Widow e Suicide Squad!"
+                                    </p>
+                                    <div class="absolute -top-2 -right-2 text-xs">💭</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Instant Discovery -->
+            <div class="journey-step bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-step="3">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Instant Discovery</h3>
+                        </div>
+                        <span class="px-2 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 rounded-full text-xs">
+                            Magical
+                        </span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        <span class="font-bold text-primary-600 dark:text-primary-400">The "Aha!" moment:</span> Complete actor profile appears instantly with cross-references.
+                    </p>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span>⏱️ 1.5 seconds</span>
+                        <span>•</span>
+                        <span>🎯 95% accuracy</span>
+                        <span>•</span>
+                        <span>✨ Delightful</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="bg-gray-50 dark:bg-gray-900 p-4">
+                    <div class="mobile-screen bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-4 py-1 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="p-3 h-full flex flex-col">
+                            <!-- Discovery Header -->
+                            <div class="text-center mb-3">
+                                <div class="inline-flex items-center space-x-2 bg-green-100 dark:bg-green-900 rounded-full px-3 py-1">
+                                    <span class="text-green-600 dark:text-green-400 text-xs">✨ Found!</span>
+                                </div>
+                            </div>
+
+                            <!-- Actor Profile -->
+                            <div class="bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl p-4 text-white mb-3 success-glow">
+                                <div class="text-center">
+                                    <div class="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-2 magic-sparkle">
+                                        <span class="text-4xl">👩</span>
+                                    </div>
+                                    <h5 class="font-bold text-lg">Millie Bobby Brown</h5>
+                                    <p class="text-sm opacity-90">as Eleven in Stranger Things</p>
+
+                                    <!-- Key Stats -->
+                                    <div class="flex justify-center space-x-4 mt-3 text-xs">
+                                        <div>
+                                            <p class="font-bold">15</p>
+                                            <p class="opacity-75">Roles</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold">8</p>
+                                            <p class="opacity-75">Genres</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold">2016</p>
+                                            <p class="opacity-75">Debut</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Key Connections -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">You've seen her in:</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2">
+                                        <div class="w-8 h-8 bg-amber-500 rounded flex items-center justify-center text-white text-xs font-bold">🔍</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Enola Holmes</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Lead role • Netflix</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2">
+                                        <div class="w-8 h-8 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">🎭</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Godzilla: King of Monsters</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Supporting role • 2019</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-auto space-y-2">
+                                <button class="w-full px-3 py-2 bg-primary-600 text-white rounded-lg text-xs font-medium">
+                                    View Full Career →
+                                </button>
+                                <button class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs">
+                                    Add to Watchlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Cross-Reference Discovery -->
+            <div class="journey-step bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-step="4">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">4</span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Cross-Reference Discovery</h3>
+                        </div>
+                        <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs">
+                            Intelligent
+                        </span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Sarah explores the actor's filmography and discovers new content through intelligent connections.
+                    </p>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span>⏱️ 30 seconds</span>
+                        <span>•</span>
+                        <span>🔗 Smart connections</span>
+                        <span>•</span>
+                        <span>📚 Rich discovery</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="bg-gray-50 dark:bg-gray-900 p-4">
+                    <div class="mobile-screen bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-4 py-1 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="p-3 h-full flex flex-col">
+                            <!-- Career Timeline -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Career Timeline</h4>
+                                <div class="relative">
+                                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                                        <div class="h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full" style="width: 70%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <span>2016</span>
+                                        <span>2024</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filmography -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Notable Roles</h4>
+                                <div class="space-y-2 max-h-48 overflow-y-auto">
+                                    <div class="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                            <span class="text-sm">🔍</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Enola Holmes 1 & 2</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Lead • 2020, 2022</p>
+                                        </div>
+                                        <div class="text-xs text-green-600 dark:text-green-400">✓</div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                            <span class="text-sm">🎭</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Stranger Things</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Main • 2016-present</p>
+                                        </div>
+                                        <div class="text-xs text-primary-600 dark:text-primary-400">★</div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
+                                        <div class="w-10 h-12 bg-primary-200 dark:bg-primary-800 rounded flex items-center justify-center">
+                                            <span class="text-sm">🎬</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">The Girls I've Been</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Upcoming • 2025</p>
+                                        </div>
+                                        <span class="text-xs text-primary-600 dark:text-primary-400">NEW</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Smart Recommendations -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Because you like Millie...</h4>
+                                <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg p-2">
+                                    <p class="text-xs text-amber-800 dark:text-amber-200 font-medium mb-1">🎯 Perfect Match</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">"Wednesday" - Addams Family series</p>
+                                </div>
+                            </div>
+
+                            <!-- User Action -->
+                            <div class="mt-auto">
+                                <button class="w-full px-3 py-2 bg-primary-600 text-white rounded-lg text-xs font-medium">
+                                    + Add "The Girls I've Been" to Watchlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Personal Collection -->
+            <div class="journey-step bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden" data-step="5">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">5</span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Personal Collection</h3>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">
+                            Saved
+                        </span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Sarah saves the actor and new content to her personal collection, building her entertainment knowledge.
+                    </p>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span>⏱️ 5 seconds</span>
+                        <span>•</span>
+                        <span>💾 One tap</span>
+                        <span>•</span>
+                        <span>📚 Growing knowledge</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Mockup -->
+                <div class="bg-gray-50 dark:bg-gray-900 p-4">
+                    <div class="mobile-screen bg-white dark:bg-gray-900">
+                        <!-- Status Bar -->
+                        <div class="bg-white dark:bg-gray-900 px-4 py-1 flex justify-between items-center text-xs">
+                            <span class="text-gray-900 dark:text-white font-medium">9:41</span>
+                            <div class="flex space-x-1">
+                                <span>📶</span>
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="p-3 h-full flex flex-col">
+                            <!-- Success Confirmation -->
+                            <div class="text-center mb-3">
+                                <div class="inline-flex items-center space-x-2 bg-green-100 dark:bg-green-900 rounded-full px-3 py-1">
+                                    <span class="text-green-600 dark:text-green-400 text-xs">✅ Saved to collection</span>
+                                </div>
+                            </div>
+
+                            <!-- Collection Stats -->
+                            <div class="grid grid-cols-2 gap-2 mb-3">
+                                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-2 text-center">
+                                    <p class="text-lg font-bold text-primary-600 dark:text-primary-400">247</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Actors Tracked</p>
+                                </div>
+                                <div class="bg-secondary-50 dark:bg-secondary-900/20 rounded-lg p-2 text-center">
+                                    <p class="text-lg font-bold text-secondary-600 dark:text-secondary-400">43</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Shows to Watch</p>
+                                </div>
+                            </div>
+
+                            <!-- Recent Additions -->
+                            <div class="mb-3">
+                                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Just Added</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                        <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold">MB</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Millie Bobby Brown</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">2 min ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+                                        <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white text-xs font-bold">🎬</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">The Girls I've Been</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">2 min ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Smart Insights -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 mb-2">
+                                <p class="text-xs text-blue-800 dark:text-blue-200 font-medium mb-1">🧠 Smart Insight</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">
+                                    3 new shows discovered this week!
+                                </p>
+                            </div>
+
+                            <!-- Continue Watching -->
+                            <div class="mt-auto">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Continue watching...</p>
+                                <button class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs">
+                                    Back to Stranger Things
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Journey Success Metrics</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">3 seconds</div>
+                    <p class="text-gray-600 dark:text-gray-300">vs 5-10 minutes manual search</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">⚡ 100x faster</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-secondary-600 dark:text-secondary-400 mb-2">95%</div>
+                    <p class="text-gray-600 dark:text-gray-300">Recognition accuracy</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">🎯 Reliable results</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2">4.8/5</div>
+                    <p class="text-gray-600 dark:text-gray-300">User satisfaction</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">😊 Delighted users</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 rounded-lg p-6">
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-3">🎉 The Magic Moment</h4>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">
+                    Sarah went from "I know that actor from somewhere" to complete career knowledge in just 3 seconds,
+                    discovering new content without interrupting her viewing experience. This is the core magic of I Know.
+                </p>
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <span class="font-medium">Result:</span> Sarah added 2 new shows to her watchlist and now feels like an entertainment expert.
+                    </p>
+                    <button onclick="playJourney()" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm">
+                        ▶️ Replay Journey
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let isDarkMode = false;
+        let journeyInterval = null;
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark');
+
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+
+            if (isDarkMode) {
+                icon.textContent = '☀️';
+                text.textContent = 'Light Mode';
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Dark Mode';
+            }
+        }
+
+        function resetJourney() {
+            if (journeyInterval) {
+                clearInterval(journeyInterval);
+                journeyInterval = null;
+            }
+            currentStep = 0;
+
+            // Remove all active classes
+            document.querySelectorAll('.journey-step').forEach(step => {
+                step.classList.remove('active');
+            });
+        }
+
+        function playJourney() {
+            resetJourney();
+
+            journeyInterval = setInterval(() => {
+                // Remove previous active
+                document.querySelectorAll('.journey-step').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Add active to current step
+                const currentStepElement = document.querySelector(`[data-step="${currentStep + 1}"]`);
+                if (currentStepElement) {
+                    currentStepElement.classList.add('active');
+                    currentStepElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+
+                currentStep++;
+
+                if (currentStep >= 5) {
+                    clearInterval(journeyInterval);
+                    journeyInterval = null;
+
+                    // Show completion
+                    setTimeout(() => {
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                        notification.textContent = '🎉 Journey Complete! Sarah discovered new content in just 3 seconds.';
+                        document.body.appendChild(notification);
+
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 4000);
+                    }, 500);
+                }
+            }, 2000);
+        }
+
+        // Add click handlers to journey steps
+        document.querySelectorAll('.journey-step').forEach(step => {
+            step.addEventListener('click', function() {
+                const stepNumber = this.dataset.step;
+
+                // Remove all active classes
+                document.querySelectorAll('.journey-step').forEach(s => {
+                    s.classList.remove('active');
+                });
+
+                // Add active to clicked step
+                this.classList.add('active');
+            });
+        });
+
+        // Check for system dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleDarkMode();
+        }
+    </script>
+</body>
+</html>

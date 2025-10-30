@@ -1,0 +1,101 @@
+# generated: 2025-10-30T00:00:00Z
+# project: I Know
+# project_key: I Know
+# tracking_system: file-system
+# story_location: {project-root}/docs/stories
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic exists in epic file but not contexted
+#   - contexted: Epic tech context created (required before drafting stories)
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder
+#   - ready-for-dev: Draft approved and story context created
+#   - in-progress: Developer actively working on implementation
+#   - review: Under SM review (via code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epics should be 'contexted' before stories can be 'drafted'
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically drafts next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', SM reviews, then Dev moves to 'done'
+
+generated: 2025-10-30T00:00:00Z
+project: I Know
+project_key: I Know
+tracking_system: file-system
+story_location: "{project-root}/docs/stories"
+
+development_status:
+  # Epic 1 Foundation & Infrastructure
+  epic-1: backlog
+  1-1-project-setup-and-development-infrastructure: backlog
+  1-2-backend-api-foundation: backlog
+  1-3-user-authentication-system: backlog
+  1-4-basic-imdb-data-pipeline: backlog
+  1-5-mobile-app-shell-and-navigation: backlog
+  1-6-basic-actor-search-and-display: backlog
+  1-7-content-detection-foundation: backlog
+  1-8-user-preferences-and-settings: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2 Core Actor Identification
+  epic-2: backlog
+  2-1-automatic-content-detection-apis: backlog
+  2-2-real-time-actor-cross-referencing-engine: backlog
+  2-3-advanced-actor-profile-interface: backlog
+  2-4-non-intrusive-overlay-system: backlog
+  2-5-performance-optimization-and-caching: backlog
+  2-6-content-metadata-standardization: backlog
+  2-7-error-handling-and-recovery: backlog
+  2-8-multi-language-content-support: backlog
+  2-9-advanced-search-and-filtering: backlog
+  2-10-content-discovery-algorithm: backlog
+  2-11-social-discovery-integration: backlog
+  2-12-analytics-and-insights-dashboard: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3 User Experience & Personalization
+  epic-3: backlog
+  3-1-enhanced-personal-profiles: backlog
+  3-2-advanced-watchlist-management: backlog
+  3-3-intelligent-content-scheduling: backlog
+  3-4-cross-platform-data-synchronization: backlog
+  3-5-enhanced-offline-experience: backlog
+  3-6-personalized-content-discovery: backlog
+  3-7-user-engagement-and-gamification: backlog
+  3-8-accessibility-and-inclusivity-features: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4 Premium Features & Monetization
+  epic-4: backlog
+  4-1-subscription-management-system: backlog
+  4-2-premium-analytics-dashboard: backlog
+  4-3-unlimited-access-features: backlog
+  4-4-enhanced-social-features: backlog
+  4-5-intelligent-notification-system: backlog
+  4-6-advanced-content-recommendations: backlog
+  4-7-customer-support-and-priority-service: backlog
+  4-8-premium-content-and-exclusives: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5 Scale & Intelligence
+  epic-5: backlog
+  5-1-advanced-machine-learning-infrastructure: backlog
+  5-2-predictive-content-analytics: backlog
+  5-3-scalable-cloud-infrastructure: backlog
+  5-4-b2b-api-integration-platform: backlog
+  5-5-advanced-security-and-privacy: backlog
+  5-6-global-content-intelligence-network: backlog
+  5-7-real-time-performance-optimization: backlog
+  5-8-business-intelligence-dashboard: backlog
+  epic-5-retrospective: optional

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Know - Color Theme Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient': 'gradient 3s ease infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: '-10px' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(-45deg, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to));
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        .theme-cinema {
+            --primary: #DC2626;
+            --primary-dark: #991B1B;
+            --secondary: #F59E0B;
+            --accent: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #3B82F6;
+        }
+        .theme-streaming {
+            --primary: #3B82F6;
+            --primary-dark: #1E40AF;
+            --secondary: #06B6D4;
+            --accent: #F97316;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #8B5CF6;
+        }
+        .theme-spotlight {
+            --primary: #8B5CF6;
+            --primary-dark: #6D28D9;
+            --secondary: #EC4899;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --warning: #F97316;
+            --error: #EF4444;
+            --info: #3B82F6;
+        }
+        .theme-premiere {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --secondary: #0891B2;
+            --accent: #DC2626;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #3B82F6;
+        }
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .theme-preview {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .theme-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .theme-preview.active {
+            border-color: currentColor;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen p-4 md:p-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">🎬 I Know Color Themes</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Visual exploration of color themes for your entertainment intelligence platform.
+                Each theme captures the delight and surprise of instant actor discovery.
+            </p>
+        </div>
+
+        <!-- Theme Controls -->
+        <div class="flex justify-center mb-8 space-x-4">
+            <button onclick="toggleDarkMode()" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition">
+                🌙 Toggle Dark Mode
+            </button>
+            <button onclick="showComparison()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                👀 Compare All
+            </button>
+        </div>
+
+        <!-- Theme Grid -->
+        <div id="themeGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
+            <!-- Theme 1: Cinema Rouge -->
+            <div class="theme-preview bg-white rounded-2xl shadow-xl overflow-hidden" data-theme="cinema">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2" style="color: var(--primary)">🎭 Cinema Rouge</h2>
+                    <p class="text-gray-600 mb-6">
+                        <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm mr-2">Dramatic</span>
+                        <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm mr-2">Premium</span>
+                        <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">Theatrical</span>
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        Rich, theatrical colors that evoke the magic of cinema. Perfect for users who want to feel like entertainment experts with access to insider knowledge.
+                    </p>
+                </div>
+
+                <!-- Color Palette -->
+                <div class="bg-gray-50 p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Color Palette</h3>
+                    <div class="grid grid-cols-6 gap-3 mb-6">
+                        <div class="color-swatch bg-red-600" title="Primary"></div>
+                        <div class="color-swatch bg-red-800" title="Primary Dark"></div>
+                        <div class="color-swatch bg-amber-500" title="Secondary"></div>
+                        <div class="color-swatch bg-violet-500" title="Accent"></div>
+                        <div class="color-swatch bg-emerald-500" title="Success"></div>
+                        <div class="color-swatch bg-gray-800" title="Text"></div>
+                    </div>
+
+                    <!-- Component Examples -->
+                    <div class="space-y-4">
+                        <div class="flex space-x-3">
+                            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Primary Action</button>
+                            <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition">Secondary</button>
+                            <button class="px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition">Outline</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-2">Actor Profile Card</h4>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">AK</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Actor Name</p>
+                                    <p class="text-sm text-gray-600">Known for: Show Title</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme 2: Streaming Blue -->
+            <div class="theme-preview bg-white rounded-2xl shadow-xl overflow-hidden" data-theme="streaming">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2" style="color: var(--primary)">🌊 Streaming Blue</h2>
+                    <p class="text-gray-600 mb-6">
+                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm mr-2">Modern</span>
+                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm mr-2">Tech-forward</span>
+                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Trustworthy</span>
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        Clean, modern streaming platform aesthetics. Appeals to tech-savvy users who value speed, efficiency, and cutting-edge entertainment technology.
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Color Palette</h3>
+                    <div class="grid grid-cols-6 gap-3 mb-6">
+                        <div class="color-swatch bg-blue-600" title="Primary"></div>
+                        <div class="color-swatch bg-blue-800" title="Primary Dark"></div>
+                        <div class="color-swatch bg-cyan-500" title="Secondary"></div>
+                        <div class="color-swatch bg-orange-500" title="Accent"></div>
+                        <div class="color-swatch bg-emerald-500" title="Success"></div>
+                        <div class="color-swatch bg-gray-800" title="Text"></div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex space-x-3">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Primary Action</button>
+                            <button class="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">Secondary</button>
+                            <button class="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition">Outline</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-2">Actor Profile Card</h4>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">AK</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Actor Name</p>
+                                    <p class="text-sm text-gray-600">Known for: Show Title</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme 3: Spotlight Purple -->
+            <div class="theme-preview bg-white rounded-2xl shadow-xl overflow-hidden" data-theme="spotlight">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2" style="color: var(--primary)">✨ Spotlight Purple</h2>
+                    <p class="text-gray-600 mb-6">
+                        <span class="inline-block px-3 py-1 bg-violet-100 text-violet-800 rounded-full text-sm mr-2">Magical</span>
+                        <span class="inline-block px-3 py-1 bg-violet-100 text-violet-800 rounded-full text-sm mr-2">Surprising</span>
+                        <span class="inline-block px-3 py-1 bg-violet-100 text-violet-800 rounded-full text-sm">Delightful</span>
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        Vibrant, magical colors that create those "wow" moments. Perfect for surprising and delighting users with instant knowledge discovery.
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Color Palette</h3>
+                    <div class="grid grid-cols-6 gap-3 mb-6">
+                        <div class="color-swatch bg-violet-600" title="Primary"></div>
+                        <div class="color-swatch bg-violet-800" title="Primary Dark"></div>
+                        <div class="color-swatch bg-pink-500" title="Secondary"></div>
+                        <div class="color-swatch bg-amber-500" title="Accent"></div>
+                        <div class="color-swatch bg-emerald-500" title="Success"></div>
+                        <div class="color-swatch bg-gray-800" title="Text"></div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex space-x-3">
+                            <button class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition">Primary Action</button>
+                            <button class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition">Secondary</button>
+                            <button class="px-4 py-2 border-2 border-violet-600 text-violet-600 rounded-lg hover:bg-violet-50 transition">Outline</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-2">Actor Profile Card</h4>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-bold">AK</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Actor Name</p>
+                                    <p class="text-sm text-gray-600">Known for: Show Title</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme 4: Premiere Green -->
+            <div class="theme-preview bg-white rounded-2xl shadow-xl overflow-hidden" data-theme="premiere">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2" style="color: var(--primary)">🎪 Premiere Green</h2>
+                    <p class="text-gray-600 mb-6">
+                        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm mr-2">Fresh</span>
+                        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm mr-2">Intelligent</span>
+                        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm">Accessible</span>
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        Fresh, intelligent colors that feel modern and accessible. Great for mainstream users who want smart entertainment tools without overwhelming complexity.
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Color Palette</h3>
+                    <div class="grid grid-cols-6 gap-3 mb-6">
+                        <div class="color-swatch bg-emerald-600" title="Primary"></div>
+                        <div class="color-swatch bg-emerald-700" title="Primary Dark"></div>
+                        <div class="color-swatch bg-cyan-600" title="Secondary"></div>
+                        <div class="color-swatch bg-red-600" title="Accent"></div>
+                        <div class="color-swatch bg-emerald-500" title="Success"></div>
+                        <div class="color-swatch bg-gray-800" title="Text"></div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex space-x-3">
+                            <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Primary Action</button>
+                            <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition">Secondary</button>
+                            <button class="px-4 py-2 border-2 border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition">Outline</button>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-2">Actor Profile Card</h4>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold">AK</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Actor Name</p>
+                                    <p class="text-sm text-gray-600">Known for: Show Title</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selection Section -->
+        <div class="text-center bg-white rounded-2xl shadow-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Which Theme Speaks to You?</h3>
+            <p class="text-gray-600 mb-6">
+                Choose a theme that captures the magic of instant actor discovery.
+                You can also combine elements or request variations!
+            </p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <button onclick="selectTheme('cinema')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-red-600 transition">
+                    <div class="w-8 h-8 bg-red-600 rounded-full mx-auto mb-2"></div>
+                    <span class="font-medium">Cinema Rouge</span>
+                </button>
+                <button onclick="selectTheme('streaming')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-600 transition">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full mx-auto mb-2"></div>
+                    <span class="font-medium">Streaming Blue</span>
+                </button>
+                <button onclick="selectTheme('spotlight')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-violet-600 transition">
+                    <div class="w-8 h-8 bg-violet-600 rounded-full mx-auto mb-2"></div>
+                    <span class="font-medium">Spotlight Purple</span>
+                </button>
+                <button onclick="selectTheme('premiere')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-600 transition">
+                    <div class="w-8 h-8 bg-emerald-600 rounded-full mx-auto mb-2"></div>
+                    <span class="font-medium">Premiere Green</span>
+                </button>
+            </div>
+
+            <div class="text-sm text-gray-500">
+                <p>💡 Tip: Think about which theme would make your users feel most delighted and surprised!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTheme = null;
+        let isDarkMode = false;
+
+        function selectTheme(themeName) {
+            selectedTheme = themeName;
+
+            // Remove active class from all previews
+            document.querySelectorAll('.theme-preview').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active class to selected theme
+            document.querySelector(`[data-theme="${themeName}"]`).classList.add('active');
+
+            // Show selection confirmation
+            const themes = {
+                cinema: 'Cinema Rouge - Dramatic and Theatrical',
+                streaming: 'Streaming Blue - Modern and Tech-forward',
+                spotlight: 'Spotlight Purple - Magical and Delightful',
+                premiere: 'Premiere Green - Fresh and Intelligent'
+            };
+
+            alert(`✨ Selected: ${themes[themeName]}\n\nThis theme will be used for your I Know app design. Let me know if you'd like any modifications!`);
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark');
+
+            if (isDarkMode) {
+                document.body.classList.add('bg-gray-900');
+                document.body.classList.remove('bg-gray-50');
+            } else {
+                document.body.classList.remove('bg-gray-900');
+                document.body.classList.add('bg-gray-50');
+            }
+        }
+
+        function showComparison() {
+            const grid = document.getElementById('themeGrid');
+            if (grid.classList.contains('lg:grid-cols-2')) {
+                grid.classList.remove('lg:grid-cols-2');
+                grid.classList.add('lg:grid-cols-4');
+            } else {
+                grid.classList.remove('lg:grid-cols-4');
+                grid.classList.add('lg:grid-cols-2');
+            }
+        }
+
+        // Add hover effects to theme previews
+        document.querySelectorAll('.theme-preview').forEach(preview => {
+            preview.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                selectTheme(theme);
+            });
+        });
+    </script>
+</body>
+</html>
