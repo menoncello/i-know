@@ -111,6 +111,7 @@ const statusRoutes = new Elysia({ prefix: '/status' })
   );
 
 import authRoutes from './auth';
+import imdbRoutes from './imdb';
 
 const actorsRoutes = new Elysia({ prefix: '/actors' }).get(
   '/',
@@ -152,6 +153,10 @@ const v1Routes = new Elysia({ prefix: '/api/v1' })
             name: 'Actors',
             description: 'Actor-related endpoints',
           },
+          {
+            name: 'IMDB',
+            description: 'IMDB data pipeline endpoints',
+          },
         ],
       },
     }),
@@ -159,6 +164,7 @@ const v1Routes = new Elysia({ prefix: '/api/v1' })
   .use(healthRoutes)
   .use(statusRoutes)
   .use(authRoutes)
+  .use(imdbRoutes)
   .use(actorsRoutes);
 
 export default v1Routes;

@@ -91,7 +91,7 @@ export async function runMigrations() {
   try {
     // Get available migration files
     const migrationsPath = join(fileURLToPath(import.meta.url), 'migrations');
-    const migrationFiles = ['001_initial_schema.sql'];
+    const migrationFiles = ['001_initial_schema.sql', '002_imdb_data_pipeline.sql'];
 
     // Get executed migrations
     const executedMigrations = await db<Migration[]>`
