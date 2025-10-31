@@ -39,6 +39,10 @@ export default [
         Blob: 'readonly',
         FormData: 'readonly',
         Headers: 'readonly',
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
+        // Bun runtime globals
+        Bun: 'readonly',
       },
     },
     rules: {
