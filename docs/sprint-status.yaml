@@ -1,4 +1,4 @@
-# generated: 2025-10-30T00:00:00Z
+# generated: 2025-10-31
 # project: I Know
 # project_key: I Know
 # tracking_system: file-system
@@ -29,11 +29,11 @@
 # - SM typically drafts next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', SM reviews, then Dev moves to 'done'
 
-generated: 2025-10-30T00:00:00Z
+generated: 2025-10-31
 project: I Know
 project_key: I Know
 tracking_system: file-system
-story_location: '{project-root}/docs/stories'
+story_location: {project-root}/docs/stories
 
 development_status:
   # Epic 1 Foundation & Infrastructure
