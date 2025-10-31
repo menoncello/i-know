@@ -58,7 +58,7 @@ export default [
       'semi': ['error', 'always'],
       'no-empty-pattern': 'off', // Allow empty patterns in destructuring
       'no-unreachable': 'off', // Disable unreachable code check for now
-      'quotes': ['error', 'single'],
+      'quotes': ['error', 'single', { allowTemplateLiterals: true, avoidEscape: true }],
     },
   },
   {
