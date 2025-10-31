@@ -295,7 +295,9 @@ test('should display error for invalid credentials', async ({ page }) => {
   await page.click('[data-testid="login-button"]');
 
   // THEN: Error message is displayed
-  await expect(page.locator('[data-testid="error-message"]')).toHaveText('Invalid email or password');
+  await expect(page.locator('[data-testid="error-message"]')).toHaveText(
+    'Invalid email or password',
+  );
 });
 ```
 
