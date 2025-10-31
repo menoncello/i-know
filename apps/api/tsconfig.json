@@ -10,7 +10,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/routes/*": ["./src/routes/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/utils/*": ["./src/utils/*"],
+      "@i-know/types": ["../../packages/types/src"],
+      "@i-know/database": ["../../packages/database/src"],
+      "@i-know/utils": ["../../packages/utils/src"],
+      "@i-know/scraper": ["../../apps/scraper/src"]
     }
   },
   "include": ["**/*.ts"]
