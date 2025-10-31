@@ -1,0 +1,33 @@
+# BMad Workflow Status
+# Generated: 2025-10-31
+# Project: I Know
+# Type: Level 3 greenfield software project
+# Path: greenfield-level-3.yaml
+
+project: "I Know"
+project_type: "software"
+project_level: "3"
+field_type: "greenfield"
+workflow_path: "greenfield-level-3.yaml"
+generated: "2025-10-31"
+
+# Workflow Status
+workflow_status:
+
+  # Phase 1: Analysis
+  brainstorm-project: docs/brainstorming-session-2025-10-29.md
+  research-market: docs/research-market-2025-10-29.md
+  research-user: docs/research-user-2025-10-29.md
+  product-brief: docs/product-brief-I-Know-2025-10-29.md
+
+  # Phase 2: Planning
+  prd: docs/prd.md
+  validate-prd: skipped
+
+  # Phase 3: Solutioning
+  create-architecture: docs/architecture.md
+  validate-architecture: docs/validation-report-2025-10-29.md
+  solutioning-gate-check: docs/implementation-readiness-report-2025-10-31.md
+
+  # Phase 4: Implementation
+  sprint-planning: docs/sprint-status.yaml
