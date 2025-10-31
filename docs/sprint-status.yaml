@@ -33,13 +33,13 @@ generated: 2025-10-30T00:00:00Z
 project: I Know
 project_key: I Know
 tracking_system: file-system
-story_location: "{project-root}/docs/stories"
+story_location: '{project-root}/docs/stories'
 
 development_status:
   # Epic 1 Foundation & Infrastructure
   epic-1: backlog
-  1-1-project-setup-and-development-infrastructure: review
-  1-2-backend-api-foundation: backlog
+  1-1-project-setup-and-development-infrastructure: done
+  1-2-backend-api-foundation: review
   1-3-user-authentication-system: backlog
   1-4-basic-imdb-data-pipeline: backlog
   1-5-mobile-app-shell-and-navigation: backlog
