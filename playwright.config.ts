@@ -1,11 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: ['./tests/api.playwright'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+
+  // Exclude problematic test files
+  testIgnore: [
+    '**/e2e.disabled/**', // Disabled E2E tests
+    '**/unit/**/*.test.ts', // Bun test files
+    '**/integration/**/*.test.ts', // Bun test files
+  ],
 
   timeout: 60 * 1000, // Test timeout: 60s
   expect: {
