@@ -33,11 +33,19 @@ async function runMigrations() {
     connectDatabase(config);
 
     console.log('🔄 Running database migrations...');
+    console.log('📋 Database config:', {
+      host: config.host,
+      port: config.port,
+      database: config.database,
+      user: config.user,
+    });
+
     await runDbMigrations();
 
     console.log('✅ Database migrations completed successfully');
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    console.error('❌ Error details:', error instanceof Error ? error.stack : 'Unknown error');
     process.exit(1);
   }
 }

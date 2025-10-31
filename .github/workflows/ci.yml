@@ -150,7 +150,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:18
+        image: postgres:16
         env:
           POSTGRES_PASSWORD: testpassword
           POSTGRES_USER: testuser
@@ -174,6 +174,18 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Wait for PostgreSQL
+        run: |
+          echo "Waiting for PostgreSQL to be ready..."
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U testuser; then
+              echo "PostgreSQL is ready!"
+              break
+            fi
+            echo "Attempt $i/30: PostgreSQL not ready, waiting..."
+            sleep 2
+          done
 
       - name: Run database migrations
         env:

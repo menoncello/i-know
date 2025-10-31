@@ -201,11 +201,19 @@ describe('Security Middleware', () => {
         .use(app =>
           app.onBeforeHandle(({ body, set }) => {
             if (typeof body === 'object' && body !== null) {
-              // Check for script injection patterns
-              const scriptPattern =
-                /<script\b[^<]*(?:(?!<\/script[\s\r\n\t]*>)<[^<]*)*<\/script[\s\r\n\t]*>/gi;
+              // Check for script injection patterns using multiple approaches
               const bodyStr = JSON.stringify(body);
-              if (scriptPattern.test(bodyStr)) {
+
+              // Method 1: Look for script opening tags
+              const scriptOpenPattern = /<script\b[^>]*>/gi;
+              // Method 2: Look for script closing tags with any whitespace
+              const scriptClosePattern = /<\/script[\s\S]*?>/gi;
+
+              // Method 3: Simple detection of both opening and closing
+              const hasScriptOpen = scriptOpenPattern.test(bodyStr);
+              const hasScriptClose = scriptClosePattern.test(bodyStr);
+
+              if (hasScriptOpen && hasScriptClose) {
                 set.status = 400;
                 return { error: 'script injection detected' };
               }
