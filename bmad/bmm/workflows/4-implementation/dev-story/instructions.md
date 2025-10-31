@@ -156,14 +156,46 @@ Expected ready-for-dev or in-progress. Continuing anyway...
     <action>Cover edge cases and error handling scenarios noted in the test plan or story notes</action>
   </step>
 
-  <step n="4" goal="Run validations and tests">
-    <action>Determine how to run tests for this repo (infer or use {{run_tests_command}} if provided)</action>
-    <action>Run all existing tests to ensure no regressions</action>
-    <action>Run the new tests to verify implementation correctness</action>
-    <action>Run linting and code quality checks if configured</action>
-    <action>Validate implementation meets ALL story acceptance criteria; if ACs include quantitative thresholds (e.g., test pass rate), ensure they are met before marking complete</action>
-    <action if="regression tests fail">STOP and fix before continuing, consider how current changes made broke regression</action>
-    <action if="new tests fail">STOP and fix before continuing</action>
+  <step n="4" goal="Run quality gates and validations" critical="true">
+    <critical>Quality validation is MANDATORY - ALL substeps must pass with ZERO errors</critical>
+
+    <substep n="4.1" goal="TypeScript type checking">
+      <critical>TypeScript strict mode is MANDATORY - ZERO compilation errors required</critical>
+      <action>Run: bun run type-check</action>
+      <check>TypeScript compilation must pass with 0 errors</check>
+      <critical>NEVER use @ts-ignore or @ts-expect-error - fix the underlying type issue</critical>
+      <action if="TypeScript errors exist">STOP and fix all type errors before continuing</action>
+    </substep>
+
+    <substep n="4.2" goal="ESLint validation">
+      <critical>Code quality is MANDATORY - ZERO ESLint errors required</critical>
+      <action>Run: bun run lint</action>
+      <check>ESLint validation must pass with 0 errors</check>
+      <critical>NEVER add eslint-disable comments - refactor code to satisfy the rule</critical>
+      <action if="ESLint errors exist">STOP and fix all linting errors before continuing</action>
+    </substep>
+
+    <substep n="4.3" goal="Code formatting validation">
+      <critical>Code formatting is MANDATORY - 100% Prettier compliance required</critical>
+      <action>Run: bun run format:check</action>
+      <check>Code must be properly formatted according to Prettier rules</check>
+      <action if="formatting issues exist">STOP and fix formatting before continuing</action>
+    </substep>
+
+    <substep n="4.4" goal="Test execution">
+      <critical>Test quality is MANDATORY - 100% pass rate required</critical>
+      <action>Run: bun run test</action>
+      <check>All tests must pass with 100% success rate</check>
+      <action if="any tests fail">STOP and fix failing tests before continuing</action>
+    </substep>
+
+    <substep n="4.5" goal="E2E test validation" optional="true">
+      <action>Run: bun run test:e2e</action>
+      <check>E2E tests should pass (continue if configuration issues exist)</check>
+    </substep>
+
+    <action>Validate implementation meets ALL story acceptance criteria</action>
+    <critical>NO story completion until ALL quality gates pass with ZERO errors</critical>
   </step>
 
   <step n="5" goal="Mark task complete, track review resolutions, and update story">
@@ -200,38 +232,7 @@ Expected ready-for-dev or in-progress. Continuing anyway...
     <action if="no tasks remain"><goto step="6">Completion</goto></action>
   </step>
 
-  <step n="4" goal="Mandatory Quality Gates Validation" tag="quality-gates">
-    <critical>QUALITY VALIDATION IS MANDATORY - ALL substeps must pass with ZERO errors</critical>
-    <critical>NEVER add eslint-disable comments or @ts-ignore/@ts-expect-error - fix the underlying code issues</critical>
-
-    <substep n="4.1" goal="TypeScript type checking">
-      <action>Run: bun run type-check</action>
-      <check>TypeScript compilation with ZERO errors required</check>
-      <critical>Fix all type errors - no exceptions, no @ts-ignore allowed</critical>
-    </substep>
-
-    <substep n="4.2" goal="ESLint validation">
-      <action>Run: bun run lint</action>
-      <check>ESLint validation with ZERO errors required</check>
-      <critical>Fix all linting errors - no eslint-disable comments allowed</critical>
-    </substep>
-
-    <substep n="4.3" goal="Code formatting check">
-      <action>Run: bun run format:check</action>
-      <check>Code must be properly formatted with ZERO issues</check>
-      <critical>Run bun run format to fix formatting issues</critical>
-    </substep>
-
-    <substep n="4.4" goal="Test execution">
-      <action>Run: bun run test</action>
-      <check>All tests must pass with 100% success rate</check>
-      <critical>Fix failing tests before proceeding</critical>
-    </substep>
-
-    <action if="any quality gate fails">STOP and resolve ALL quality issues before continuing</action>
-  </step>
-
-  <step n="5" goal="Story completion and mark for review" tag="sprint-status">
+  <step n="6" goal="Story completion and mark for review" tag="sprint-status">
     <action>Verify ALL tasks and subtasks are marked [x] (re-scan the story document now)</action>
     <action>Run the full regression suite (do not skip)</action>
     <action>Confirm File List includes every changed file</action>
@@ -257,7 +258,7 @@ Story is marked Ready for Review in file, but sprint-status.yaml may be out of s
     <action if="File List is incomplete">Update it before completing</action>
   </step>
 
-  <step n="6" goal="Completion communication and user support">
+  <step n="7" goal="Completion communication and user support">
     <action>Optionally run the workflow validation task against the story using {project-root}/bmad/core/tasks/validate-workflow.xml</action>
     <action>Prepare a concise summary in Dev Agent Record → Completion Notes</action>
 

@@ -15,7 +15,7 @@ test('should create user with valid data', async () => {
   // Given
   const userData = {
     email: 'test@example.com',
-    name: 'Test User'
+    name: 'Test User',
   };
 
   // When
@@ -39,7 +39,7 @@ describe('UserService', () => {
       // Given
       const userData = {
         email: 'test@example.com',
-        name: 'Test User'
+        name: 'Test User',
       };
 
       // When
@@ -57,8 +57,9 @@ describe('UserService', () => {
       await createUser({ email: existingEmail, name: 'Existing User' });
 
       // When/Then
-      await expect(createUser({ email: existingEmail, name: 'New User' }))
-        .toThrow('Email already exists');
+      await expect(createUser({ email: existingEmail, name: 'New User' })).toThrow(
+        'Email already exists',
+      );
     });
   });
 });
@@ -75,7 +76,7 @@ test('should authenticate user with valid credentials', async () => {
   // Given
   const user = await createTestUser({
     email: 'user@example.com',
-    password: 'password123'
+    password: 'password123',
   });
 
   // When
@@ -98,7 +99,7 @@ export function createTestUser(overrides = {}) {
     id: 'test-user-id',
     email: 'test@example.com',
     name: 'Test User',
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -147,12 +148,11 @@ test('should throw validation error for invalid data', async () => {
   // Given
   const invalidData = {
     email: 'invalid-email',
-    name: '' // Empty name
+    name: '', // Empty name
   };
 
   // When/Then
-  await expect(createUser(invalidData))
-    .toThrow(new ValidationError('Invalid email format'));
+  await expect(createUser(invalidData)).toThrow(new ValidationError('Invalid email format'));
 });
 ```
 
@@ -166,7 +166,7 @@ import { beforeEach, afterEach, mock } from 'bun:test';
 const mockEmailService = mock(() => ({
   sendEmail: async (to: string, subject: string) => {
     return { success: true, messageId: 'msg-123' };
-  }
+  },
 }));
 
 beforeEach(() => {
@@ -182,15 +182,12 @@ test('should send welcome email after user registration', async () => {
   // When
   await userService.registerUser({
     email: 'newuser@example.com',
-    name: 'New User'
+    name: 'New User',
   });
 
   // Then
   expect(emailService.sendEmail).toHaveBeenCalledTimes(1);
-  expect(emailService.sendEmail).toHaveBeenCalledWith(
-    'newuser@example.com',
-    'Welcome to I Know!'
-  );
+  expect(emailService.sendEmail).toHaveBeenCalledWith('newuser@example.com', 'Welcome to I Know!');
 });
 ```
 
@@ -203,7 +200,7 @@ test('should create and retrieve user from database', async () => {
   // Given
   const userData = {
     email: 'integration@example.com',
-    name: 'Integration Test User'
+    name: 'Integration Test User',
   };
 
   // When
@@ -224,16 +221,17 @@ test('should handle user registration API endpoint', async () => {
   const app = createApp();
   const userData = {
     email: 'api@example.com',
-    name: 'API Test User'
+    name: 'API Test User',
   };
 
   // When
-  const response = await app
-    .handle(new Request('http://localhost/api/users', {
+  const response = await app.handle(
+    new Request('http://localhost/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    }));
+      body: JSON.stringify(userData),
+    }),
+  );
 
   // Then
   expect(response.status).toBe(201);
@@ -253,7 +251,7 @@ All tests must pass TypeScript strict mode:
 test('should handle typed user data', async () => {
   const userData: CreateUserData = {
     email: 'test@example.com',
-    name: 'Test User'
+    name: 'Test User',
   };
 
   const user: User = await createUser(userData);
@@ -262,7 +260,9 @@ test('should handle typed user data', async () => {
 
 // ❌ Bad - Using 'any'
 test('should handle typed user data', async () => {
-  const userData: any = { /* ... */ }; // AVOID
+  const userData: any = {
+    /* ... */
+  }; // AVOID
 });
 ```
 
@@ -356,7 +356,7 @@ describe('UserService', () => {
 test.each([
   { email: 'valid@example.com', expected: true },
   { email: 'invalid-email', expected: false },
-  { email: '', expected: false }
+  { email: '', expected: false },
 ])('should validate email: $email', ({ email, expected }) => {
   expect(validateEmail(email)).toBe(expected);
 });
@@ -365,9 +365,7 @@ test.each([
 ### 3. Environment-Specific Tests
 
 ```typescript
-test.skip(process.env.NODE_ENV === 'production',
-  'should run development-only tests'
-, () => {
+test.skip(process.env.NODE_ENV === 'production', 'should run development-only tests', () => {
   // Development-specific test logic
 });
 ```

@@ -3,6 +3,7 @@
 ## Project Overview
 
 **I Know** is an entertainment intelligence platform built with:
+
 - **Runtime**: Bun 1.3.1+
 - **Language**: TypeScript 5.9.3 (Strict mode)
 - **Frontend**: Astro 5.12.0 + React 19.2.0 + Tailwind CSS 4.1.16
@@ -154,4 +155,4 @@ All BMAD agents are personalized to enforce this project's quality standards:
 
 ---
 
-*This quick reference is specific to the I Know project. All agents and workflows are personalized for this project's technology stack and quality standards.*
+_This quick reference is specific to the I Know project. All agents and workflows are personalized for this project's technology stack and quality standards._

@@ -5,13 +5,13 @@
 # Override agent name
 agent:
   metadata:
-    name: ""
+    name: ''
 
 # Replace entire persona (not merged)
 persona:
-  role: ""
-  identity: ""
-  communication_style: ""
+  role: ''
+  identity: ''
+  communication_style: ''
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
@@ -25,14 +25,21 @@ critical_actions:
       - Correct formatting (Prettier)
       - Use project's test runner patterns (Bun Test)
       - Examples must be copy-paste ready
+      - Use project's technology stack (Bun, Elysia, Astro, React 19.2.0)
+      - NEVER include eslint-disable or @ts-ignore in templates
+      - All code examples must compile and pass linting
 
       Templates guide developers - they must exemplify best practices and be immediately usable.
+      Code examples are NOT pseudocode - they are executable demonstrations.
 
 # Add persistent memories for the agent
 memories:
-  - "Story templates must be production-ready and demonstrate correct patterns"
-  - "Use Bun Test patterns in test examples, not Jest or Vitest"
-  - "Quality standards: TypeScript 0 errors, ESLint 0 errors, Formatting 100%"
+  - 'Story templates must be production-ready and demonstrate correct patterns'
+  - 'Use Bun Test patterns in test examples, not Jest or Vitest'
+  - 'Quality standards: TypeScript 0 errors, ESLint 0 errors, Formatting 100%'
+  - 'Templates must use project stack: Bun 1.3.1, TypeScript 5.9.3, Elysia, Astro, React 19.2.0'
+  - 'NEVER include eslint-disable or @ts-ignore in story templates'
+  - 'All template code examples must be copy-paste ready and immediately usable'
 # Example:
 # memories:
 #   - "User prefers detailed technical explanations"
