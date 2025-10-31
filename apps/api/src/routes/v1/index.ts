@@ -11,7 +11,7 @@ const checkDatabaseHealth = async (): Promise<boolean> => {
   // In non-test mode, try to check actual database health
   try {
     // This will be implemented when we have actual database connection
-    // For now, always return true unless an error occurs
+    // For now, return true (will be replaced with actual health check)
     return true;
   } catch (error) {
     console.error('Database health check failed:', error);
