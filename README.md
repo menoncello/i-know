@@ -88,6 +88,52 @@ bun run dev:api    # http://localhost:3001
 bun run dev:scraper
 ```
 
+## 🌳 Branching Strategy
+
+This project follows **Git Flow** branching pattern:
+
+### Main Branches
+
+- **`main`**: Production-ready code, only accepts merges from `develop`
+- **`develop`**: Integration branch for features, accepts merges from feature branches
+
+### Feature Branches
+
+- **Pattern**: `feature/story-number-description` (e.g., `feature/1-2-user-authentication`)
+- **Source**: Always branch from `develop`
+- **Destination**: Merge back to `develop` via Pull Request
+
+### Workflow Template
+
+```bash
+# 1. Create feature branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/1-2-feature-description
+
+# 2. Work on your feature
+# Make commits, push regularly
+git add .
+git commit -m "feat: implement user authentication"
+git push origin feature/1-2-feature-description
+
+# 3. Create Pull Request to develop
+# Use GitHub UI to create PR from feature/1-2-feature-description -> develop
+
+# 4. After PR approval and merge, update develop
+git checkout develop
+git pull origin develop
+
+# 5. Clean up feature branch (optional)
+git branch -d feature/1-2-feature-description
+```
+
+### Branch Protection Rules
+
+- **main**: Requires PR approval, CI/CD checks, and no force pushes
+- **develop**: Requires CI/CD checks, no force pushes
+- **feature**: No direct pushes to main/develop, PRs required
+
 ## 📋 Available Scripts
 
 ### Development

@@ -1,0 +1,13 @@
+import { test, expect } from '@playwright/test';
+import { buildApiUrl } from '../support/config/test-config';
+
+// P2: Basic connection validation tests
+test.describe('API Connection Test', () => {
+  test('1.2-CONN-001: should fail to connect to non-existent endpoint', async ({ request }) => {
+    // WHEN: Making request to non-existent endpoint
+    const response = await request.get(buildApiUrl('/health'));
+
+    // THEN: Should fail (RED phase verification)
+    expect(response.status()).toBe(404);
+  });
+});

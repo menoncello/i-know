@@ -1,0 +1,289 @@
+import { test, expect } from '@playwright/test';
+import { createUser, createAuthTokens } from '../support/fixtures/factories/auth-factory';
+import { buildApiUrl } from '../support/config/test-config';
+
+// P0: Critical authentication flows
+test.describe('Backend API Foundation - Authentication Service', () => {
+  test.describe('POST /api/v1/auth/register', () => {
+    test('1.2-AUTH-001: should register new user with valid data', async ({ request }) => {
+      // GIVEN: Valid user registration data
+      const userData = createUser({
+        email: 'newuser@example.com',
+        password: 'SecurePass123!',
+        name: 'New User',
+      });
+
+      // WHEN: Registering user via API
+      const response = await request.post(buildApiUrl('/auth/register'), {
+        data: {
+          email: userData.email,
+          password: userData.password,
+          name: userData.name,
+        },
+      });
+
+      // THEN: User is created successfully
+      expect(response.status()).toBe(201);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        user: {
+          id: expect.any(String),
+          email: userData.email,
+          name: userData.name,
+          createdAt: expect.any(String),
+        },
+        tokens: {
+          accessToken: expect.any(String),
+          refreshToken: expect.any(String),
+        },
+      });
+    });
+
+    test('1.2-AUTH-002: should reject registration with invalid email', async ({ request }) => {
+      // GIVEN: Invalid user data
+      const userData = createUser({
+        email: 'invalid-email',
+        password: 'SecurePass123!',
+        name: 'Test User',
+      });
+
+      // WHEN: Attempting registration with invalid email
+      const response = await request.post(buildApiUrl('/auth/register'), {
+        data: {
+          email: userData.email,
+          password: userData.password,
+          name: userData.name,
+        },
+      });
+
+      // THEN: Registration is rejected
+      expect(response.status()).toBe(400);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        error: 'Validation Error',
+        message: expect.stringContaining('Invalid email format'),
+      });
+    });
+
+    test('1.2-AUTH-003: should reject registration with weak password', async ({ request }) => {
+      // GIVEN: User data with weak password
+      const userData = createUser({
+        email: 'test@example.com',
+        password: '123', // Weak password
+        name: 'Test User',
+      });
+
+      // WHEN: Attempting registration with weak password
+      const response = await request.post(buildApiUrl('/auth/register'), {
+        data: {
+          email: userData.email,
+          password: userData.password,
+          name: userData.name,
+        },
+      });
+
+      // THEN: Registration is rejected
+      expect(response.status()).toBe(400);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        error: 'Validation Error',
+        message: expect.stringContaining('Password must be at least 8 characters'),
+      });
+    });
+  });
+
+  test.describe('POST /api/v1/auth/login', () => {
+    test('1.2-AUTH-004: should authenticate user with valid credentials', async ({
+      request,
+    }) => {
+      // GIVEN: Registered user
+      const userData = createUser({
+        email: 'login@example.com',
+        password: 'CorrectPass123!',
+        name: 'Login User',
+      });
+
+      // User should be registered first (this will fail until implementation)
+      const registerResponse = await request.post(buildApiUrl('/auth/register'), {
+        data: {
+          email: userData.email,
+          password: userData.password,
+          name: userData.name,
+        },
+      });
+
+      expect(registerResponse.status()).toBe(201);
+
+      // WHEN: Logging in with valid credentials
+      const loginResponse = await request.post(buildApiUrl('/auth/login'), {
+        data: {
+          email: userData.email,
+          password: userData.password,
+        },
+      });
+
+      // THEN: User is authenticated successfully
+      expect(loginResponse.status()).toBe(200);
+      const body = await loginResponse.json();
+      expect(body).toMatchObject({
+        user: {
+          id: expect.any(String),
+          email: userData.email,
+          name: userData.name,
+        },
+        tokens: {
+          accessToken: expect.any(String),
+          refreshToken: expect.any(String),
+        },
+      });
+    });
+
+    test('1.2-AUTH-005: should reject login with invalid credentials', async ({ request }) => {
+      // GIVEN: Invalid login credentials
+      const invalidCredentials = {
+        email: 'nonexistent@example.com',
+        password: 'wrongpassword',
+      };
+
+      // WHEN: Attempting login with invalid credentials
+      const response = await request.post(buildApiUrl('/auth/login'), {
+        data: invalidCredentials,
+      });
+
+      // THEN: Login is rejected
+      expect(response.status()).toBe(401);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        error: 'Authentication Error',
+        message: 'Invalid email or password',
+      });
+    });
+  });
+
+  test.describe('POST /api/v1/auth/refresh', () => {
+    test('1.2-AUTH-006: should refresh access token with valid refresh token', async ({
+      request,
+    }) => {
+      // GIVEN: Valid refresh token
+      const tokens = createAuthTokens({
+        accessToken: 'expired-access-token',
+        refreshToken: 'valid-refresh-token',
+      });
+
+      // WHEN: Refreshing access token
+      const response = await request.post(buildApiUrl('/auth/refresh'), {
+        data: {
+          refreshToken: tokens.refreshToken,
+        },
+      });
+
+      // THEN: New access token is generated
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
+      });
+      expect(body.accessToken).not.toBe(tokens.accessToken);
+    });
+
+    test('1.2-AUTH-007: should reject refresh token with invalid token', async ({ request }) => {
+      // GIVEN: Invalid refresh token
+      const invalidRefreshToken = 'invalid-refresh-token';
+
+      // WHEN: Attempting token refresh
+      const response = await request.post(buildApiUrl('/auth/refresh'), {
+        data: {
+          refreshToken: invalidRefreshToken,
+        },
+      });
+
+      // THEN: Refresh is rejected
+      expect(response.status()).toBe(401);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        error: 'Authentication Error',
+        message: 'Invalid or expired refresh token',
+      });
+    });
+  });
+});
+
+// P1: Important security and rate limiting features
+test.describe('Backend API Foundation - Rate Limiting', () => {
+  test('1.2-SEC-001: should enforce rate limits on authentication endpoints', async ({
+    request,
+  }) => {
+    // GIVEN: Rate limit threshold (e.g., 5 requests per minute)
+    const credentials = {
+      email: 'ratelimit@example.com',
+      password: 'TestPass123!',
+    };
+
+    // WHEN: Making multiple rapid requests beyond rate limit
+    const responses = [];
+    for (let i = 0; i < 10; i++) {
+      const response = await request.post(buildApiUrl('/auth/login'), {
+        data: credentials,
+      });
+      responses.push(response);
+    }
+
+    // THEN: Requests beyond rate limit are rejected
+    const successResponses = responses.filter(r => r.status() === 200 || r.status() === 401);
+    const rateLimitResponses = responses.filter(r => r.status() === 429);
+
+    expect(rateLimitResponses.length).toBeGreaterThan(0);
+
+    const rateLimitResponse = rateLimitResponses[0];
+    if (rateLimitResponse) {
+      const body = await rateLimitResponse.json();
+      expect(body).toMatchObject({
+        error: 'Rate Limit Exceeded',
+        message: expect.stringContaining('Too many requests'),
+      });
+      expect(rateLimitResponse.headers()).toMatchObject({
+        'retry-after': expect.any(String),
+      });
+    }
+  });
+});
+
+test.describe('Backend API Foundation - Security Headers', () => {
+  test('1.2-SEC-002: should include security headers on API responses', async ({ request }) => {
+    // WHEN: Making request to API endpoint
+    const response = await request.get(buildApiUrl('/health'));
+
+    // THEN: Security headers are present
+    expect(response.status()).toBe(200);
+    expect(response.headers()).toMatchObject({
+      'x-frame-options': 'DENY',
+      'x-content-type-options': 'nosniff',
+      'x-xss-protection': '1; mode=block',
+      'strict-transport-security': 'max-age=31536000; includeSubDomains',
+    });
+  });
+});
+
+test.describe('Backend API Foundation - CORS Configuration', () => {
+  test('1.2-SEC-003: should handle CORS preflight requests', async ({ request }) => {
+    // WHEN: Making CORS preflight request
+    const response = await request.fetch(buildApiUrl('/auth/login'), {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'https://mobile-app.example.com',
+        'Access-Control-Request-Method': 'POST',
+        'Access-Control-Request-Headers': 'Content-Type, Authorization',
+      },
+    });
+
+    // THEN: CORS headers are properly configured
+    expect(response.status()).toBe(204);
+    expect(response.headers()).toMatchObject({
+      'access-control-allow-origin': 'https://mobile-app.example.com',
+      'access-control-allow-methods': expect.stringContaining('POST'),
+      'access-control-allow-headers': 'Content-Type, Authorization',
+      'access-control-max-age': expect.any(String),
+    });
+  });
+});

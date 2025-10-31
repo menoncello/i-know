@@ -210,23 +210,28 @@ Will update existing story file rather than creating new one.
     <template-output file="{default_output_file}">change_log</template-output>
   </step>
 
-  <step n="7.5" goal="Validate Code Examples Quality">
-    <action>Extract all code examples from story content</action>
-    <action>Validate TypeScript compilation for each example</action>
-    <action>Validate ESLint compliance for each example</action>
-    <action>Validate formatting compliance for each example</action>
-    <check if="any code example fails quality validation">
-      <output>❌ CODE EXAMPLE QUALITY ISSUES:
-      Code examples must meet production quality standards:
-      - TypeScript: 0 compilation errors
-      - ESLint: 0 validation errors
-      - Formatting: 0 issues
+  <step n="7.5" goal="Validate code examples quality" critical="true">
+    <critical>All code examples in stories must be production-ready</critical>
 
-      Fix code examples before saving story.
+    <action>Extract all code examples from the story (including code blocks in Tasks, Dev Notes, and examples)</action>
+    <action>For each code example:
+      - Check TypeScript compilation (strict mode, 0 errors)
+      - Check ESLint validation (0 errors)
+      - Check formatting compliance
+      - Verify imports and dependencies exist
+      - Check for eslint-disable or @ts-ignore comments
+    </action>
+
+    <check if="any code example fails quality validation">
+      <action>Fix the code example to meet quality standards</action>
+      <critical>Stories with low-quality code examples cannot be saved</critical>
+      <output>❌ Code example quality issues detected and fixed:
+      - {{issues_found}} examples updated to meet quality standards
       </output>
-      <action>Request fixes for code example quality issues</action>
-      <action>HALT until code examples meet quality standards</action>
     </check>
+
+    <action>Validate that code examples use project's technology stack correctly</action>
+    <critical>Code examples are not pseudocode - they must be executable</critical>
   </step>
 
   <step n="8" goal="Validate, save, and mark story drafted" tag="sprint-status">
@@ -253,6 +258,7 @@ You may need to run sprint-planning to refresh tracking, or manually set the sto
     <output>**✅ Story Created Successfully, {user_name}!**
 
 **Story Details:**
+
 - Story ID: {{story_id}}
 - Story Key: {{story_key}}
 - File: {{story_file}}
@@ -261,6 +267,7 @@ You may need to run sprint-planning to refresh tracking, or manually set the sto
 **⚠️ Important:** The following workflows are context-intensive. It's recommended to clear context and restart the SM agent before running the next command.
 
 **Next Steps:**
+
 1. Review the drafted story in {{story_file}}
 2. **[RECOMMENDED]** Run `story-context` to generate technical context XML and mark story ready for development (combines context + ready in one step)
 3. Or run `story-ready` to manually mark the story ready without generating technical context

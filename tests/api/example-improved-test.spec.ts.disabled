@@ -1,0 +1,109 @@
+/**
+ * Example Improved Test
+ * Demonstrates the use of test IDs, priority markers, cleanup logic, and centralized configuration
+ */
+
+import { test, expect } from '@playwright/test';
+import { test as testWithFixtures } from '../support/fixtures';
+import { buildApiUrl } from '../support/config/test-config';
+import { createUser } from '../support/fixtures/factories/auth-factory';
+
+// P0: Critical functionality test
+test.describe('Example - Improved Test Structure', () => {
+  test.beforeEach(async () => {
+    console.log('🔄 Setting up test...');
+  });
+
+  test.afterEach(async () => {
+    console.log('🧹 Test cleanup completed');
+  });
+
+  test('1.2-EXAMPLE-001: demonstrates improved test with cleanup', async ({ request }) => {
+    // GIVEN: A test user created with factory
+    const testUser = createUser({
+      email: 'improved-test@example.com',
+      name: 'Improved Test User',
+    });
+
+    console.log(`👤 Created test user: ${testUser.id}`);
+
+    // WHEN: Making API request using centralized URL configuration
+    const response = await request.post(buildApiUrl('/auth/register'), {
+      data: {
+        email: testUser.email,
+        password: testUser.password,
+        name: testUser.name,
+      },
+    });
+
+    // THEN: Validate response with explicit assertions
+    expect(response.status()).toBe(201);
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      user: {
+        id: expect.any(String),
+        email: testUser.email,
+        name: testUser.name,
+        createdAt: expect.any(String),
+      },
+      tokens: {
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
+      },
+    });
+
+    console.log(`✅ Test completed successfully for user: ${testUser.email}`);
+  });
+
+  test('1.2-EXAMPLE-002: demonstrates error handling with cleanup', async ({ request }) => {
+    // GIVEN: Invalid user data for negative testing
+    const invalidUserData = {
+      email: 'invalid-email-format',
+      password: 'weak',
+      name: '',
+    };
+
+    // WHEN: Attempting registration with invalid data
+    const response = await request.post(buildApiUrl('/auth/register'), {
+      data: invalidUserData,
+    });
+
+    // THEN: Expect validation errors
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      error: 'Validation Error',
+      message: expect.any(String),
+    });
+
+    console.log('✅ Error handling test completed');
+  });
+});
+
+// Example using fixtures with automatic cleanup
+testWithFixtures.describe('Example - Using Fixtures with Cleanup', () => {
+  testWithFixtures(
+    '1.2-EXAMPLE-003: uses test fixture with automatic cleanup',
+    async ({ request, testUser, testCleanup }) => {
+      // GIVEN: Test user provided by fixture (automatically registered for cleanup)
+      console.log(`👤 Using fixture user: ${testUser.email} (${testUser.id})`);
+
+      // WHEN: Using the test user in API call
+      const response = await request.post(buildApiUrl('/auth/login'), {
+        data: {
+          email: testUser.email,
+          password: testUser.password,
+        },
+      });
+
+      // THEN: Validate response
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body.user.email).toBe(testUser.email);
+
+      console.log('✅ Fixture test completed - cleanup will run automatically');
+    },
+  );
+});

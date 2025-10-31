@@ -1,0 +1,52 @@
+import { test, expect } from '@playwright/test';
+import { buildApiUrl } from '../support/config/test-config';
+
+// P2: Simple validation tests for RED phase verification
+test.describe('Backend API Foundation - Simple Tests', () => {
+  test('1.2-SIMPLE-001: should fail to register user - endpoint not implemented', async ({
+    request,
+  }) => {
+    // GIVEN: Valid user data
+    const userData = {
+      email: 'test@example.com',
+      password: 'SecurePass123!',
+      name: 'Test User',
+    };
+
+    // WHEN: Trying to register user
+    const response = await request.post(buildApiUrl('/auth/register'), {
+      data: userData,
+    });
+
+    // THEN: Should fail because endpoint not implemented (RED phase)
+    expect(response.status()).toBe(404);
+  });
+
+  test('1.2-SIMPLE-002: should fail to login user - endpoint not implemented', async ({
+    request,
+  }) => {
+    // GIVEN: Login credentials
+    const credentials = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    // WHEN: Trying to login
+    const response = await request.post(buildApiUrl('/auth/login'), {
+      data: credentials,
+    });
+
+    // THEN: Should fail because endpoint not implemented (RED phase)
+    expect(response.status()).toBe(404);
+  });
+
+  test('1.2-SIMPLE-003: should fail to get health status - endpoint not implemented', async ({
+    request,
+  }) => {
+    // WHEN: Trying to get health status
+    const response = await request.get(buildApiUrl('/health'));
+
+    // THEN: Should fail because endpoint not implemented (RED phase)
+    expect(response.status()).toBe(404);
+  });
+});

@@ -544,7 +544,7 @@ test('[P0] should display user info', async ({ page }) => {
 ```typescript
 test('should load user dashboard after login', async ({ page }) => {
   // CRITICAL: Intercept routes BEFORE navigation
-  await page.route('**/api/user', (route) =>
+  await page.route('**/api/user', route =>
     route.fulfill({
       status: 200,
       body: JSON.stringify({ id: 1, name: 'Test User' }),

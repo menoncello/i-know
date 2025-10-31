@@ -104,22 +104,32 @@ These issues must be addressed before story can be approved.
     </check>
   </step>
 
-  <step n="5" goal="Verify Quality Gates Enforcement">
-    <action>Scan implemented code for eslint-disable comments</action>
-    <action>Scan implemented code for @ts-ignore/@ts-expect-error comments</action>
-    <check if="quality anti-patterns found">
-      <output>❌ QUALITY VIOLATIONS DETECTED:
-      - eslint-disable comments found: {{count}}
-      - @ts-ignore/@ts-expect-error found: {{count}}
+  <step n="5" goal="Verify Quality Gates Enforcement" critical="true">
+    <critical>Quality gates verification is MANDATORY for story approval</critical>
 
-    These violate project quality standards. All quality issues must be fixed.
-      </output>
-      <action>Request fixes for all quality violations</action>
+    <action>Check story file for any eslint-disable comments in code examples</action>
+    <check if="eslint-disable comments found">
+      <action>Flag as HIGH severity finding: "eslint-disable comments found - code should comply with rules"</action>
+      <action>Add review follow-up task to remove all eslint-disable comments</action>
     </check>
 
-    <action>Verify TypeScript compilation was run with 0 errors</action>
-    <action>Verify ESLint validation was run with 0 errors</action>
-    <action>Verify all tests pass with 100% success rate</action>
+    <action>Check story file for any @ts-ignore or @ts-expect-error comments</action>
+    <check if="@ts-ignore comments found">
+      <action>Flag as HIGH severity finding: "@ts-ignore comments found - fix underlying type issues"</action>
+      <action>Add review follow-up task to fix type issues instead of suppressing</action>
+    </check>
+
+    <action>Verify Dev Agent Record shows TypeScript compilation was run with 0 errors</action>
+    <action>Verify Dev Agent Record shows ESLint validation was run with 0 errors</action>
+    <action>Verify Dev Agent Record shows test execution achieved 100% pass rate</action>
+    <action>Verify Dev Agent Record shows formatting validation passed</action>
+
+    <check if="quality gate verification cannot be confirmed">
+      <action>Flag as MEDIUM severity finding: "Quality gates verification missing from completion notes"</action>
+      <action>Request confirmation that all quality gates were satisfied</action>
+    </check>
+
+    <critical>Stories with quality gate violations cannot be approved</critical>
   </step>
 
   <step n="6" goal="Review decision and documentation">
