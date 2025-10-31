@@ -90,7 +90,7 @@ export async function runMigrations() {
 
   try {
     // Get available migration files
-    const migrationsPath = join(fileURLToPath(import.meta.url), '..', 'migrations');
+    const migrationsPath = join(fileURLToPath(import.meta.url), 'migrations');
     const migrationFiles = ['001_initial_schema.sql'];
 
     // Get executed migrations

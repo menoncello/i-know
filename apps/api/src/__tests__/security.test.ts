@@ -202,7 +202,7 @@ describe('Security Middleware', () => {
           app.onBeforeHandle(({ body, set }) => {
             if (typeof body === 'object' && body !== null) {
               // Check for script injection patterns
-              const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+              const scriptPattern = /<script\b[^<]*(?:(?!<\/script\s*>)<[^<]*)*<\/script\s*>/gi;
               const bodyStr = JSON.stringify(body);
               if (scriptPattern.test(bodyStr)) {
                 set.status = 400;
