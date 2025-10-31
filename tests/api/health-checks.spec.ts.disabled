@@ -1,0 +1,148 @@
+import { testWithInfrastructure as test, expect } from '../support/fixtures';
+import { buildApiUrl, buildHealthUrl } from '../support/config/test-config';
+
+// P1: Important monitoring and health check endpoints
+test.describe('Backend API Foundation - Health Checks', () => {
+  test.describe('GET /api/v1/health', () => {
+    test('1.2-HEALTH-001: should return basic health status', async ({ request }) => {
+      // WHEN: Checking basic health endpoint
+      const response = await request.get(buildApiUrl('/health'));
+
+      // THEN: Health status is returned
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        status: 'healthy',
+        timestamp: expect.any(String),
+        uptime: expect.any(Number),
+      });
+    });
+  });
+
+  test.describe('GET /api/v1/status', () => {
+    test('1.2-HEALTH-002: should return detailed system status', async ({ request }) => {
+      // WHEN: Checking detailed status endpoint
+      const response = await request.get(buildApiUrl('/status'));
+
+      // THEN: Detailed system status is returned
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        status: 'healthy',
+        timestamp: expect.any(String),
+        uptime: expect.any(Number),
+        version: expect.any(String),
+        environment: expect.any(String),
+        services: {
+          database: expect.objectContaining({
+            status: expect.any(String),
+            responseTime: expect.any(Number),
+          }),
+          redis: expect.objectContaining({
+            status: expect.any(String),
+            responseTime: expect.any(Number),
+          }),
+        },
+        metrics: {
+          activeConnections: expect.any(Number),
+          totalRequests: expect.any(Number),
+          errorRate: expect.any(Number),
+          avgResponseTime: expect.any(Number),
+        },
+      });
+    });
+
+    test('1.2-HEALTH-003: should indicate database connectivity issues', async ({ request }) => {
+      // GIVEN: Database is unavailable (this would be mocked in real implementation)
+      // WHEN: Database is down
+      const response = await request.get(buildApiUrl('/status'));
+
+      // THEN: Status reflects database issues
+      expect(response.status()).toBe(503);
+      const body = await response.json();
+      expect(body.status).toBe('unhealthy');
+      expect(body.services.database.status).toBe('unhealthy');
+      expect(body.services.database.error).toContain('Database connection failed');
+    });
+
+    test('1.2-HEALTH-004: should include performance metrics', async ({ request }) => {
+      // WHEN: Requesting status with performance metrics
+      const response = await request.get(buildApiUrl('/status'));
+
+      // THEN: Performance metrics are included
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+
+      // Verify metrics structure
+      expect(body.metrics).toMatchObject({
+        memory: {
+          used: expect.any(Number),
+          total: expect.any(Number),
+          percentage: expect.any(Number),
+        },
+        cpu: {
+          usage: expect.any(Number),
+          cores: expect.any(Number),
+        },
+        requests: {
+          total: expect.any(Number),
+          successful: expect.any(Number),
+          failed: expect.any(Number),
+          avgResponseTime: expect.any(Number),
+        },
+      });
+    });
+  });
+
+  test.describe('GET /api/v1/ready', () => {
+    test('1.2-HEALTH-005: should return readiness status for container orchestration', async ({
+      request,
+    }) => {
+      // WHEN: Checking readiness probe
+      const response = await request.get(buildApiUrl('/ready'));
+
+      // THEN: Readiness status is returned
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        ready: true,
+        checks: {
+          database: 'ready',
+          redis: 'ready',
+          external_services: 'ready',
+        },
+      });
+    });
+
+    test('1.2-HEALTH-006: should indicate not ready when dependencies are unavailable', async ({
+      request,
+    }) => {
+      // GIVEN: External dependencies not ready
+      // WHEN: Checking readiness during startup
+      const response = await request.get(buildApiUrl('/ready'));
+
+      // THEN: Service reports not ready
+      expect(response.status()).toBe(503);
+      const body = await response.json();
+      expect(body.ready).toBe(false);
+      expect(body.checks.database).toBe('not_ready');
+    });
+  });
+
+  test.describe('GET /api/v1/live', () => {
+    test('1.2-HEALTH-007: should return liveness status for container orchestration', async ({
+      request,
+    }) => {
+      // WHEN: Checking liveness probe
+      const response = await request.get(buildApiUrl('/live'));
+
+      // THEN: Liveness status is returned
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body).toMatchObject({
+        alive: true,
+        timestamp: expect.any(String),
+      });
+    });
+  });
+});
