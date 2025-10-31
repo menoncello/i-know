@@ -1,5 +1,12 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable UUID extension (if not already available)
+-- Note: Some PostgreSQL providers have uuid-ossp pre-enabled
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'uuid-ossp') THEN
+    CREATE EXTENSION "uuid-ossp";
+  END IF;
+END
+$$;
 
 -- Create custom UUID v7 generator function
 CREATE OR REPLACE FUNCTION uuid_v7()
@@ -41,7 +48,7 @@ $$ LANGUAGE plpgsql;
 
 -- Users table
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -50,7 +57,7 @@ CREATE TABLE users (
 
 -- User preferences table with JSONB for flexible settings
 CREATE TABLE user_preferences (
-  id UUID PRIMARY KEY DEFAULT uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   preferences JSONB NOT NULL DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -60,7 +67,7 @@ CREATE TABLE user_preferences (
 
 -- Actors table (foundation for future stories)
 CREATE TABLE actors (
-  id UUID PRIMARY KEY DEFAULT uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
   bio TEXT,
   birth_date DATE,
@@ -73,7 +80,7 @@ CREATE TABLE actors (
 
 -- Filmography table (for actor-film relationships)
 CREATE TABLE filmography (
-  id UUID PRIMARY KEY DEFAULT uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_id UUID NOT NULL REFERENCES actors(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   year INTEGER,
