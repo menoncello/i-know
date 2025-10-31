@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "📝 Validating commit message..."
+
+# Check if commit message follows conventional commits
+# Pattern: type(scope): description
+# Types: feat, fix, docs, style, refactor, test, chore
+commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}'
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "❌ Commit message does not follow conventional commits format."
+    echo "Expected format: type(scope): description"
+    echo "Types: feat, fix, docs, style, refactor, test, chore"
+    echo "Example: feat(auth): add user login functionality"
+    echo "Example: fix(api): resolve null pointer exception"
+    exit 1
+fi
+
+echo "✅ Commit message is valid!"

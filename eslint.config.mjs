@@ -7,13 +7,8 @@ export default [
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
         console: 'readonly',
         process: 'readonly',
@@ -29,6 +24,21 @@ export default [
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        // Node.js globals
+        NodeJS: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        // Web/API globals
+        Request: 'readonly',
+        Response: 'readonly',
+        URL: 'readonly',
+        fetch: 'readonly',
+        Blob: 'readonly',
+        FormData: 'readonly',
+        Headers: 'readonly',
       },
     },
     rules: {
@@ -52,6 +62,7 @@ export default [
       '*.config.mjs',
       '.next/**',
       'apps/web/dist/**',
+      '**/*.astro', // Ignore Astro files for now to avoid parser issues
     ],
   },
 ];
